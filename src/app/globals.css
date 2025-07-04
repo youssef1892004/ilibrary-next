@@ -1,26 +1,36 @@
+/* globals.css */
+
+/* استيراد Tailwind v4 بالطريقة الصحيحة */
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* يمكنك الاحتفاظ بالمتغيرات الخاصة بك، لكن Tailwind v4 
+  يتعامل مع الألوان الأساسية بشكل مختلف. 
+  للبساطة وضمان عمل الوضع الليلي، سنعتمد على إعدادات Tailwind المدمجة حاليًا.
+*/
 
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* === تعديلات الـ Navbar تبدأ من هنا === */
+/* هذه ستبقى تعمل كما هي لأنها تستخدم @apply */
+
+.nav-link {
+  @apply text-lg font-semibold text-white hover:text-gray-300 transition-colors duration-300;
+}
+
+.btn-primary-solid {
+  @apply bg-purple-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-purple-700 transition-all duration-300 shadow-lg;
+}
+
+.btn-primary-outline {
+  @apply bg-transparent border border-gray-300 text-gray-200 font-semibold py-2 px-5 rounded-lg hover:bg-gray-700 hover:text-white transition-all duration-300;
+}
+
+.icon-button {
+  @apply text-white hover:text-gray-300 transition-colors duration-300;
+}
+
+.fav-badge {
+  @apply absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-purple-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center;
 }
