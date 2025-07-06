@@ -1,74 +1,89 @@
-// src/app/books/[id]/BookDetailsClient.jsx
+// src/components/BookDetails.jsx
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { FaBookOpen, FaTag, FaBuilding, FaUserCircle, FaCalendarAlt, FaFileAlt } from "react-icons/fa";
+import { FaUserAlt, FaCalendarAlt, FaBook, FaListOl, FaBarcode, FaFileAlt, FaChevronDown } from 'react-icons/fa';
 import { useLanguage } from '@/context/LanguageContext';
-import RelatedBooks from '@/components/RelatedBooks';
 
-export default function BookDetailsClient({ book }) {
+const BookDetails = ({ book }) => {
   const { t } = useLanguage();
-
-  if (!book) {
-    return null;
-  }
+  const [isChaptersOpen, setIsChaptersOpen] = useState(false);
+  
+  // استخلاص البيانات باستخدام أسماء العلاقات الصحيحة
+  const author = book.Book_Author;
+  const chapters = book.Chapters || [];
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 pt-0">
-      <div className="relative pt-32 pb-16 overflow-hidden text-white text-center">
-        <div className="absolute inset-0 z-0">
-          <Image src={book.coverImage} alt={`خلفية غلاف ${book.title}`} layout="fill" objectFit="cover" className="filter blur-2xl scale-110" priority />
-          <div className="absolute inset-0 bg-black/60"></div>
-        </div>
-        <div className="relative z-10 flex flex-col items-center px-4">
-          <div className="w-48 md:w-56">
-            <Image src={book.coverImage} alt={`غلاف كتاب ${book.title}`} width={400} height={600} className="rounded-lg shadow-2xl mb-6 border-4 border-white/20" />
-          </div>
-          <h1 className="text-4xl font-bold" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>{book.title}</h1>
-          <p className="text-xl mt-2 opacity-90" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>{t.by || "بقلم"}: {book.author}</p>
-          <div className="mt-8">
-            <Link href={`/read/${book.id}`} className="inline-flex items-center gap-2 px-8 py-3 bg-purple-600 text-white font-bold rounded-full shadow-lg hover:bg-purple-700 transition-transform hover:scale-105">
-              <FaBookOpen /><span>{t.startReading || "ابدأ القراءة"}</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-      <div className="py-20">
-        <div className="container mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2">
-              <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-6 border-b-2 border-purple-500 pb-2">{t.aboutTheBook || "عن الكتاب"}</h2>
-              <div className="text-lg text-gray-700 dark:text-gray-300 leading-loose space-y-4"><p>{book.summary || book.description}</p></div>
-            </div>
-            <div className="lg:col-span-1 space-y-8">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">{t.theAuthor || "الكاتب"}</h3>
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex items-center gap-4">
-                  <FaUserCircle className="text-purple-500" size={40} />
-                  <div>
-                    <h4 className="font-bold text-xl text-gray-900 dark:text-gray-100">{book.author}</h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t.authorRole || "مؤلف الكتاب"}</p>
-                  </div>
+    <div className="container mx-auto px-4 py-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+        
+        <div className="lg:col-span-1">
+          <div className="sticky top-24">
+            <img
+              src={book.cover_URL || 'https://placehold.co/400x600/e2e8f0/4a5568?text=No+Image'}
+              alt={book.title}
+              className="w-full h-auto object-cover rounded-lg shadow-2xl"
+              onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x600/e2e8f0/4a5568?text=Error'; }}
+            />
+            <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                <div className="flex items-center gap-4 mb-3">
+                    <FaUserAlt className="text-purple-500" />
+                    <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">الكاتب</p>
+                        <p className="font-semibold text-gray-800 dark:text-gray-200">{author?.name || 'غير معروف'}</p>
+                    </div>
                 </div>
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">{t.bookDetails || "تفاصيل الكتاب"}</h3>
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md space-y-4">
-                  <div className="flex items-center gap-4 text-gray-700 dark:text-gray-300"><FaTag className="text-purple-500" /> <span className="font-semibold">{t.category || "الفئة"}:</span> <span>{book.category}</span></div>
-                  <div className="flex items-center gap-4 text-gray-700 dark:text-gray-300"><FaBuilding className="text-purple-500" /> <span className="font-semibold">{t.publisher || "الناشر"}:</span> <span>{book.publisher}</span></div>
-                  <div className="flex items-center gap-4 text-gray-700 dark:text-gray-300"><FaFileAlt className="text-purple-500" /> <span className="font-semibold">{t.pages || "الصفحات"}:</span> <span>{book.pages}</span></div>
-                  <div className="flex items-center gap-4 text-gray-700 dark:text-gray-300"><FaCalendarAlt className="text-purple-500" /> <span className="font-semibold">{t.publishDate || "تاريخ النشر"}:</span> <span>{book.publishDate}</span></div>
+                <div className="flex items-center gap-4">
+                    <FaCalendarAlt className="text-purple-500" />
+                    <div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">تاريخ النشر</p>
+                        <p className="font-semibold text-gray-800 dark:text-gray-200">{book.publication_date || 'غير محدد'}</p>
+                    </div>
                 </div>
-              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="container mx-auto px-4 py-8">
-        <RelatedBooks currentBookId={book.id} category={book.category} />
+
+        <div className="lg:col-span-2">
+          <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">{book.title}</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">{book.description}</p>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 text-center">
+              <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg"><FaListOl className="mx-auto text-purple-500 mb-1" /><p className="text-sm">عدد الأجزاء</p><p className="font-bold">{book.parts_num || 'N/A'}</p></div>
+              <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg"><FaFileAlt className="mx-auto text-purple-500 mb-1" /><p className="text-sm">عدد الصفحات</p><p className="font-bold">{book.total_pages || 'N/A'}</p></div>
+              <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg"><FaBarcode className="mx-auto text-purple-500 mb-1" /><p className="text-sm">ISBN</p><p className="font-bold">{book.ISBN || 'N/A'}</p></div>
+          </div>
+
+          <div className="mt-10">
+            <button
+              onClick={() => setIsChaptersOpen(!isChaptersOpen)}
+              className="w-full flex justify-between items-center text-left text-2xl font-bold mb-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            >
+              <span className="flex items-center gap-2"><FaBook />{t.chapters || "فصول الكتاب"}</span>
+              <FaChevronDown className={`transition-transform duration-300 ${isChaptersOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isChaptersOpen ? 'max-h-[1000px]' : 'max-h-0'}`}>
+              <div className="space-y-3 pt-2">
+                {chapters.length > 0 ? (
+                  chapters.map((chapter) => (
+                    <Link href={`/read/${chapter.id}`} key={chapter.id}>
+                      <div className="block p-4 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-all">
+                        <p className="font-semibold text-purple-600 dark:text-purple-400">{t.chapter || "الفصل"} {chapter.chapter_num}: {chapter.title}</p>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">لا توجد فصول متاحة لهذا الكتاب حالياً.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default BookDetails;

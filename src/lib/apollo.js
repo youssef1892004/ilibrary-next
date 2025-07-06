@@ -1,14 +1,20 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
+// src/lib/apollo.js
 
-const httpLink = createHttpLink({
-  uri: process.env.REACT_APP_GRAPHQL_URI || 'http://localhost:4000/graphql',
-});
+import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
-const client = new ApolloClient({
-  link: httpLink,
-  cache: new InMemoryCache(),
-});
+const createApolloClient = () => {
+  const httpLink = new HttpLink({
+    uri: 'https://graphql-333f98f9a304.hosted.ghaymah.systems/v1/graphql',
+    headers: {
+      // هنا نقوم بإضافة الـ secret key من متغيرات البيئة
+      'x-hasura-admin-secret': process.env.NEXT_PUBLIC_HASURA_ADMIN_SECRET
+    }
+  });
 
-export default client;
+  return new ApolloClient({
+    link: httpLink,
+    cache: new InMemoryCache(),
+  });
+};
 
-
+export default createApolloClient;

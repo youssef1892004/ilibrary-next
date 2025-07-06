@@ -3,12 +3,16 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { FaHeart, FaRegHeart, FaBookOpen, FaStar, FaStarHalfAlt, FaRegStar, FaUserAlt } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaBookOpen, FaUserAlt } from 'react-icons/fa';
 import { useFavorites } from '@/context/FavoritesContext';
-import CloudinaryImage from './CloudinaryImage';
 import { useLanguage } from '@/context/LanguageContext';
 
-const BookCard = ({ book }) => {
+// 1. المكون يستقبل الآن اسم الكاتب كخاصية منفصلة
+const BookCard = ({ book, authorName }) => {
+  if (!book) {
+    return null; 
+  }
+
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const { t } = useLanguage();
   const isFavorite = favorites.some((fav) => fav.id === book.id);
@@ -23,41 +27,17 @@ const BookCard = ({ book }) => {
     }
   };
 
-  // --- التعديل هنا: تم إضافة key فريد لكل عنصر ---
-  const renderStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const halfStar = rating % 1 >= 0.5;
-    
-    // النجوم الكاملة
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(<FaStar key={`full-${i}`} />);
-    }
-    
-    // النجم النصفي
-    if (halfStar) {
-      stars.push(<FaStarHalfAlt key="half" />);
-    }
-    
-    // النجوم الفارغة
-    const emptyStars = 5 - stars.length;
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(<FaRegStar key={`empty-${i}`} />);
-    }
-    
-    return stars;
-  };
-
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col h-full transition-shadow duration-300 hover:shadow-2xl group">
       <Link href={`/books/${book.id}`} className="block relative">
         <div className="aspect-[3/4] bg-gray-200 dark:bg-gray-700">
-          <CloudinaryImage
-            publicId={book.coverImage}
+          <img
+            src={book.cover_URL || 'https://placehold.co/250x375/e2e8f0/4a5568?text=No+Image'}
             alt={book.title}
             width="250"
             height="375"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/250x375/e2e8f0/4a5568?text=Error'; }}
           />
         </div>
       </Link>
@@ -69,16 +49,10 @@ const BookCard = ({ book }) => {
           </h3>
         </Link>
 
+        {/* 2. عرض اسم الكاتب الذي تم تمريره */}
         <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
           <FaUserAlt size={12} />
-          <p className="text-base font-medium truncate">{book.author}</p>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
-          <div className="flex text-yellow-400">
-            {renderStars(book.rating)}
-          </div>
-          <span className="dark:text-gray-400">({book.reviews})</span>
+          <p className="text-base font-medium truncate">{authorName || 'مؤلف غير معروف'}</p>
         </div>
 
         <div className="flex-grow"></div> 

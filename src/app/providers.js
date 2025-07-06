@@ -1,21 +1,29 @@
-// src/app/providers.js
 "use client";
 
-import { AuthProvider } from "@/context/AuthContext";
-import { FavoritesProvider } from "@/context/FavoritesContext";
-import { LanguageProvider } from "@/context/LanguageContext";
-import { ThemeProvider } from "@/context/ThemeContext"; // تأكد من استدعائه
+import React from 'react';
+import { ApolloProvider } from '@apollo/client';
+import createApolloClient from '../lib/apollo'; // استيراد الدالة التي تنشئ العميل
+import { AuthProvider } from '../context/AuthContext';
+import { FavoritesProvider } from '../context/FavoritesContext';
+import { LanguageProvider } from '../context/LanguageContext';
+import { ThemeProvider } from '../context/ThemeContext';
+
+// نقوم بإنشاء نسخة من العميل مرة واحدة
+const client = createApolloClient();
 
 export function Providers({ children }) {
   return (
-    <LanguageProvider>
+    // 1. إضافة ApolloProvider كأب رئيسي
+    <ApolloProvider client={client}>
       <AuthProvider>
         <FavoritesProvider>
-          <ThemeProvider> {/* يجب أن يكون هنا ليغلف كل شيء */}
-            {children}
-          </ThemeProvider>
+          <LanguageProvider>
+            <ThemeProvider>
+              {children}
+            </ThemeProvider>
+          </LanguageProvider>
         </FavoritesProvider>
       </AuthProvider>
-    </LanguageProvider>
+    </ApolloProvider>
   );
 }
