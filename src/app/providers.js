@@ -1,25 +1,33 @@
+// src/app/providers.js
 "use client";
+
 
 import React from 'react';
 import { ApolloProvider } from '@apollo/client';
-import createApolloClient from '../lib/apollo'; // استيراد الدالة التي تنشئ العميل
+import createApolloClient from '../lib/apollo';
 import { AuthProvider } from '../context/AuthContext';
 import { FavoritesProvider } from '../context/FavoritesContext';
 import { LanguageProvider } from '../context/LanguageContext';
-import { ThemeProvider } from '../context/ThemeContext';
+// import { ThemeProvider } from '../context/ThemeContext';
+// 1. استيراد الـ Provider الجديد
+import { ReadingProgressProvider } from '../context/ReadingProgressContext';
 
-// نقوم بإنشاء نسخة من العميل مرة واحدة
+
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import ThemeProvider from '@/context/ThemeProvider';
+// ...
 const client = createApolloClient();
 
 export function Providers({ children }) {
   return (
-    // 1. إضافة ApolloProvider كأب رئيسي
     <ApolloProvider client={client}>
       <AuthProvider>
         <FavoritesProvider>
           <LanguageProvider>
-            <ThemeProvider>
-              {children}
+           <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+              <ReadingProgressProvider>
+                {children}
+              </ReadingProgressProvider>
             </ThemeProvider>
           </LanguageProvider>
         </FavoritesProvider>

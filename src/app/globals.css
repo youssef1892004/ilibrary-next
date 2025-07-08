@@ -1,7 +1,9 @@
 /* globals.css */
 
 /* استيراد Tailwind v4 بالطريقة الصحيحة */
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* يمكنك الاحتفاظ بالمتغيرات الخاصة بك، لكن Tailwind v4 
   يتعامل مع الألوان الأساسية بشكل مختلف. 

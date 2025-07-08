@@ -7,7 +7,7 @@ import { FaHeart, FaRegHeart, FaBookOpen, FaUserAlt } from 'react-icons/fa';
 import { useFavorites } from '@/context/FavoritesContext';
 import { useLanguage } from '@/context/LanguageContext';
 
-// 1. المكون يستقبل الآن اسم الكاتب كخاصية منفصلة
+// 1. المكون يستقبل الآن book و authorName كخواص منفصلة
 const BookCard = ({ book, authorName }) => {
   if (!book) {
     return null; 
@@ -23,7 +23,7 @@ const BookCard = ({ book, authorName }) => {
     if (isFavorite) {
       removeFavorite(book.id);
     } else {
-      addFavorite(book);
+      addFavorite({ ...book, author: authorName }); 
     }
   };
 
@@ -52,14 +52,14 @@ const BookCard = ({ book, authorName }) => {
         {/* 2. عرض اسم الكاتب الذي تم تمريره */}
         <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
           <FaUserAlt size={12} />
-          <p className="text-base font-medium truncate">{authorName || 'مؤلف غير معروف'}</p>
+          <p className="text-base font-medium truncate">{authorName || 'غير معروف'}</p>
         </div>
 
         <div className="flex-grow"></div> 
 
         <div className="mt-4 flex items-center gap-2">
           <Link 
-            href={`/read/${book.id}`} 
+            href={`/books/${book.id}`} 
             className="flex-grow flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
           >
             <FaBookOpen />

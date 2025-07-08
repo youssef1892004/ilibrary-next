@@ -7,9 +7,9 @@ import { useParams } from 'next/navigation';
 import BookDetails from '@/components/BookDetails';
 import RelatedBooks from '@/components/RelatedBooks';
 
-// 1. استخدام اسم العلاقة الصحيح والمؤكد: Book_Author
-const GET_BOOK_DETAILS = gql`
-  query GetBookDetails($id: uuid!) {
+// الاستعلام الأول: يجلب تفاصيل الكتاب فقط (بدون الكاتب)
+const GET_BOOK = gql`
+  query GetBook($id: uuid!) {
     ilibarary_Book_by_pk(id: $id) {
       id
       title
@@ -19,14 +19,8 @@ const GET_BOOK_DETAILS = gql`
       parts_num
       total_pages
       ISBN
-      # اسم العلاقة الصحيح للكاتب
-      Book_Author {
-        id
-        name
-        image_url
-      }
-      # اسم العلاقة الصحيح للفصول
-      Chapters(order_by: { chapter_num: asc }) {
+      author_id # نحتاج هذا لجلب الكاتب
+      Chapters(order_by: { chapter_num: asc }, limit: 200) {
         id
         title
         chapter_num
@@ -35,16 +29,40 @@ const GET_BOOK_DETAILS = gql`
   }
 `;
 
+// الاستعلام الثاني: يجلب تفاصيل الكاتب فقط
+const GET_AUTHOR = gql`
+  query GetAuthor($id: uuid!) {
+    ilibarary_Autor_by_pk(id: $id) {
+      id
+      name
+      image_url
+    }
+  }
+`;
+
 const BookDetailsPage = () => {
   const params = useParams();
   const bookId = params.id;
 
-  const { loading, error, data } = useQuery(GET_BOOK_DETAILS, {
+  // تنفيذ الاستعلام الأول لجلب الكتاب
+  const { loading: bookLoading, error: bookError, data: bookData } = useQuery(GET_BOOK, {
     variables: { id: bookId },
     skip: !bookId,
   });
 
-  if (loading) {
+  const book = bookData?.ilibarary_Book_by_pk;
+  const authorId = book?.author_id;
+
+  // تنفيذ الاستعلام الثاني لجلب الكاتب (فقط بعد الحصول على author_id)
+  const { loading: authorLoading, error: authorError, data: authorData } = useQuery(GET_AUTHOR, {
+    variables: { id: authorId },
+    skip: !authorId, // لا تقم بالطلب إذا لم يكن هناك author_id
+  });
+
+  const author = authorData?.ilibarary_Autor_by_pk;
+
+  // دمج حالات التحميل والخطأ
+  if (bookLoading || (authorId && authorLoading)) {
     return (
       <div className="container mx-auto text-center py-20">
         <p className="text-xl">جاري تحميل تفاصيل الكتاب...</p>
@@ -52,30 +70,27 @@ const BookDetailsPage = () => {
     );
   }
 
-  if (error) {
-    console.error("ApolloError fetching book details:", error);
+  if (bookError || authorError) {
+    console.error("ApolloError:", bookError || authorError);
     return (
       <div className="container mx-auto text-center py-20 text-red-500">
-        <p className="text-xl">عفواً، حدث خطأ أثناء جلب تفاصيل الكتاب.</p>
-        <p>الرسالة: {error.message}</p>
+        <p>حدث خطأ أثناء جلب البيانات.</p>
       </div>
     );
   }
 
-  const book = data?.ilibarary_Book_by_pk;
-
-  if (!book && !loading) {
+  if (!book && !bookLoading) {
     return (
-        <div className="container mx-auto text-center py-20">
-            <h1 className="text-3xl font-bold">الكتاب غير موجود</h1>
-            <p className="mt-4">عفواً، لم نتمكن من العثور على الكتاب الذي تبحث عنه.</p>
-        </div>
+      <div className="container mx-auto text-center py-20">
+        <h1 className="text-3xl font-bold">الكتاب غير موجود</h1>
+      </div>
     );
   }
 
   return (
     <>
-      {book && <BookDetails book={book} />}
+      {/* تمرير بيانات الكتاب والكاتب بشكل منفصل */}
+      {book && <BookDetails book={book} author={author} />}
       {book && <RelatedBooks currentBookId={book.id} />}
     </>
   );

@@ -7,8 +7,9 @@ import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { useTheme } from "@/context/ThemeContext";
+import { useThem } from "@/context/ThemeContext";
 import { FaMoon, FaSun, FaBars, FaTimes, FaHeart } from "react-icons/fa";
+import ThemeSwitcher from "@/context/ThemeSwitcher";
 
 const NavLink = ({ href, children, onClick }) => (
   <Link href={href} onClick={onClick} className="nav-link">
@@ -21,7 +22,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { favorites } = useFavorites();
   const { language, t } = useLanguage();
-  const { theme, toggleTheme } = useTheme();
+  // const { theme, toggleTheme } ;
 
   useEffect(() => {
     const handleResize = () => {
@@ -63,10 +64,10 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center justify-end gap-4 sm:gap-5">
-            <button onClick={toggleTheme} className="icon-button" aria-label="Toggle theme">
+            {/* <button onClick={toggleTheme} className="icon-button" aria-label="Toggle theme">
               {theme === 'dark' ? <FaSun className="text-yellow-400" size={22} /> : <FaMoon className="text-gray-200" size={22} />}
-            </button>
-            
+            </button> */}
+            <ThemeSwitcher/>
             <Link href="/favorites" className="icon-button relative">
               <FaHeart className="hover:text-red-500" size={24} />
               {favorites.length > 0 && (
@@ -84,9 +85,9 @@ export default function Navbar() {
                   <Link href="/auth" className="btn-primary-outline">
                     {t.login || "دخول"}
                   </Link>
-                  <Link href="/auth" className="btn-primary-solid">
+                  {/* <Link href="/auth" className="btn-primary-solid">
                     {t.signup || "تسجيل"}
-                  </Link>
+                  </Link> */}
                 </>
               )}
             </div>

@@ -1,18 +1,28 @@
 // src/lib/apollo.js
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
 
-import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+// الرابط الخاص بالـ API
+const httpLink = createHttpLink({
+  uri: 'https://graphql-333f98f9a304.hosted.ghaymah.systems/v1/graphql',
+});
+
+// هذا هو الجزء الأهم: إضافة الهيدر (Header) مع كل طلب
+const authLink = setContext((_, { headers }) => {
+  // إرجاع الهيدر مع تحديد دور "public"
+  // هذا يسمح بالوصول إلى البيانات التي تم تحديد صلاحياتها للعامة في Hasura
+  return {
+    headers: {
+      ...headers,
+      'x-hasura-role': 'public',
+    }
+  };
+});
 
 const createApolloClient = () => {
-  const httpLink = new HttpLink({
-    uri: 'https://graphql-333f98f9a304.hosted.ghaymah.systems/v1/graphql',
-    headers: {
-      // هنا نقوم بإضافة الـ secret key من متغيرات البيئة
-      'x-hasura-admin-secret': process.env.NEXT_PUBLIC_HASURA_ADMIN_SECRET
-    }
-  });
-
   return new ApolloClient({
-    link: httpLink,
+    // دمج رابط المصادقة مع رابط الـ HTTP
+    link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
   });
 };
