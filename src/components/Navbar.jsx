@@ -7,8 +7,7 @@ import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { useThem } from "@/context/ThemeContext";
-import { FaMoon, FaSun, FaBars, FaTimes, FaHeart } from "react-icons/fa";
+import { FaBars, FaTimes, FaHeart } from "react-icons/fa";
 import ThemeSwitcher from "@/context/ThemeSwitcher";
 
 const NavLink = ({ href, children, onClick }) => (
@@ -19,10 +18,9 @@ const NavLink = ({ href, children, onClick }) => (
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { favorites } = useFavorites();
-  const { language, t } = useLanguage();
-  // const { theme, toggleTheme } ;
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handleResize = () => {
@@ -64,9 +62,6 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center justify-end gap-4 sm:gap-5">
-            {/* <button onClick={toggleTheme} className="icon-button" aria-label="Toggle theme">
-              {theme === 'dark' ? <FaSun className="text-yellow-400" size={22} /> : <FaMoon className="text-gray-200" size={22} />}
-            </button> */}
             <ThemeSwitcher/>
             <Link href="/favorites" className="icon-button relative">
               <FaHeart className="hover:text-red-500" size={24} />
@@ -76,19 +71,21 @@ export default function Navbar() {
             </Link>
 
             <div className="hidden sm:flex items-center gap-4">
-              {user ? (
-                <button onClick={logout} className="btn-primary-outline">
-                  {t.logout || "خروج"}
-                </button>
-              ) : (
-                <>
-                  <Link href="/auth" className="btn-primary-outline">
-                    {t.login || "دخول"}
+              {isLoading ? (
+                <div className="h-9 w-24 bg-gray-700 rounded-lg animate-pulse"></div>
+              ) : user ? (
+                <div className="flex items-center gap-3">
+                  <Link href="/profile" className="font-semibold hover:text-purple-400 transition-colors">
+                    {user.displayName || user.email}
                   </Link>
-                  {/* <Link href="/auth" className="btn-primary-solid">
-                    {t.signup || "تسجيل"}
-                  </Link> */}
-                </>
+                  <button onClick={logout} className="btn-primary-outline">
+                    {t.logout || "خروج"}
+                  </button>
+                </div>
+              ) : (
+                <Link href="/auth" className="btn-primary-outline">
+                  {t.login || "دخول"}
+                </Link>
               )}
             </div>
             
@@ -108,9 +105,15 @@ export default function Navbar() {
               <NavLink key={link.href} href={link.href} onClick={() => setIsMobileMenuOpen(false)}>{link.label}</NavLink>
             ))}
              <div className="border-t border-gray-700 pt-4 mt-2 space-y-3">
-                {user ? (
+                {isLoading ? (
+                  <p className="px-2 text-base font-medium mb-3">...</p>
+                ) : user ? (
                     <>
-                      <p className="px-2 text-base font-medium mb-3">مرحباً، {user.name}</p>
+                      <div className="px-2 text-base font-medium mb-3">
+                        <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                          مرحباً، {user.displayName || user.email}
+                        </Link>
+                      </div>
                       <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="w-full btn-primary-outline">
                         {t.logout || "خروج"}
                       </button>
@@ -119,9 +122,6 @@ export default function Navbar() {
                     <>
                       <Link href="/auth" className="block w-full btn-primary-outline text-center" onClick={() => setIsMobileMenuOpen(false)}>
                         {t.login || "دخول"}
-                      </Link>
-                      <Link href="/auth" className="block w-full btn-primary-solid text-center" onClick={() => setIsMobileMenuOpen(false)}>
-                        {t.signup || "تسجيل"}
                       </Link>
                     </>
                 )}

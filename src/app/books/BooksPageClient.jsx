@@ -1,23 +1,20 @@
 // src/app/books/BooksPageClient.jsx
 "use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import BookCard from '@/components/BookCard';
-import Pagination from '@/components/Pagination';
 import { useLanguage } from '@/context/LanguageContext';
 import { FaSearch } from 'react-icons/fa';
 
 const BOOKS_PER_PAGE = 20;
 
-// 1. تحديث استعلام GraphQL ليقبل متغيرات البحث
-// نستخدم _ilike للبحث غير الحساس لحالة الأحرف
-const GET_PAGINATED_BOOKS_WITH_SEARCH = gql`
-  query GetPaginatedBooksWithSearch($limit: Int!, $offset: Int!, $search: String!) {
-    # جلب الكتب التي تطابق شرط البحث
+// 1. تعديل الاستعلام لإزالة aggregate التي قد تسبب مشكلة في الصلاحيات
+const GET_BOOKS_WITH_SEARCH = gql`
+  query GetBooksWithSearch($limit: Int!, $offset: Int!, $search: String!) {
     ilibarary_Book(
-      limit: $limit, 
-      offset: $offset, 
+      limit: $limit,
+      offset: $offset,
       order_by: { publication_date: desc },
       where: {
         _or: [
@@ -31,50 +28,49 @@ const GET_PAGINATED_BOOKS_WITH_SEARCH = gql`
       cover_URL
       author_id
     }
-    # جلب كل المؤلفين لربطهم بالكتب
     ilibarary_Autor {
       id
       name
     }
-    # جلب العدد الإجمالي للكتب المطابقة للبحث لحساب عدد الصفحات
- 
-    
-    }
-  
+  }
 `;
 
 const BooksPageClient = () => {
   const { t } = useLanguage();
-  const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [hasMore, setHasMore] = useState(true);
 
-  // 2. استخدام Debouncing لتأخير تنفيذ البحث أثناء الكتابة
+  // Debouncing لتأخير البحث
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 500); // تأخير نصف ثانية
-
-    return () => {
-      clearTimeout(handler);
-    };
+    }, 500);
+    return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  // 3. إعادة تعيين الصفحة إلى 1 عند تغيير مصطلح البحث
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearchTerm]);
-
-  const offset = (currentPage - 1) * BOOKS_PER_PAGE;
-
-  // 4. تنفيذ الاستعلام مع تمرير متغير البحث
-  const { loading, error, data } = useQuery(GET_PAGINATED_BOOKS_WITH_SEARCH, {
-    variables: { 
-      limit: BOOKS_PER_PAGE, 
-      offset: offset,
-      search: `%${debouncedSearchTerm}%` // إضافة % للبحث الجزئي
+  const { loading, error, data, fetchMore } = useQuery(GET_BOOKS_WITH_SEARCH, {
+    variables: {
+      limit: BOOKS_PER_PAGE,
+      offset: 0,
+      search: `%${debouncedSearchTerm}%`
     },
+    onCompleted: (data) => {
+      // إذا كانت الدفعة الأولى من الكتب أقل من الحد الأقصى، فهذا يعني أنه لا يوجد المزيد
+      if (data.ilibarary_Book.length < BOOKS_PER_PAGE) {
+        setHasMore(false);
+      } else {
+        setHasMore(true);
+      }
+    },
+    // إعادة تعيين الحالة عند تغيير البحث
+    notifyOnNetworkStatusChange: true,
   });
+
+  // إعادة تعيين hasMore عند بدء بحث جديد
+  useEffect(() => {
+    setHasMore(true);
+  }, [debouncedSearchTerm]);
 
   const authorsMap = useMemo(() => {
     if (!data?.ilibarary_Autor) return new Map();
@@ -83,15 +79,47 @@ const BooksPageClient = () => {
     return map;
   }, [data?.ilibarary_Autor]);
 
-  const totalBooks = data?.ilibarary_Book_aggregate?.aggregate?.count || 0;
-  const totalPages = Math.ceil(totalBooks / BOOKS_PER_PAGE);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   const books = data?.ilibarary_Book || [];
+
+  const loadMore = useCallback(() => {
+    // لا تقم بالجلب إذا كان هناك طلب قيد التنفيذ أو لا يوجد المزيد من البيانات
+    if (loading || !hasMore) return;
+
+    fetchMore({
+      variables: {
+        offset: books.length
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult || fetchMoreResult.ilibarary_Book.length === 0) {
+          setHasMore(false); // لا يوجد المزيد من الكتب
+          return prev;
+        }
+        
+        // إذا كانت النتائج الجديدة أقل من المطلوب، فهذه هي النهاية
+        if (fetchMoreResult.ilibarary_Book.length < BOOKS_PER_PAGE) {
+            setHasMore(false);
+        }
+
+        return {
+          ...prev,
+          ilibarary_Book: [...prev.ilibarary_Book, ...fetchMoreResult.ilibarary_Book],
+        };
+      },
+    });
+  }, [loading, hasMore, books.length, fetchMore]);
+
+  // مراقبة التمرير
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + document.documentElement.scrollTop < document.documentElement.offsetHeight - 500 || loading || !hasMore) {
+        return;
+      }
+      loadMore();
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loading, hasMore, loadMore]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -99,7 +127,6 @@ const BooksPageClient = () => {
         {t.allBooks || "جميع الكتب"}
       </h1>
 
-      {/* 5. إضافة شريط البحث */}
       <div className="mb-12 max-w-2xl mx-auto">
         <div className="relative">
           <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
@@ -115,35 +142,30 @@ const BooksPageClient = () => {
         </div>
       </div>
 
-      {loading && <div className="text-center py-10"><p>جاري البحث...</p></div>}
-      {error && <div className="text-center py-10 text-red-500"><p>حدث خطأ في جلب البيانات.</p></div>}
+      {loading && books.length === 0 && <div className="text-center py-10"><p>جاري البحث...</p></div>}
+      {error && <div className="text-center py-10 text-red-500"><p>حدث خطأ في جلب البيانات. يرجى المحاولة مرة أخرى.</p></div>}
       
-      {!loading && !error && (
+      {!error && (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {books.map((book) => {
               const authorName = authorsMap.get(book.author_id);
-              return <BookCard key={book.id} book={book} authorName={authorName} />;
+              return <BookCard key={`${book.id}-${book.title}`} book={book} authorName={authorName} />;
             })}
           </div>
           
-          {books.length === 0 && (
+          {books.length === 0 && !loading && (
             <div className="text-center py-20">
               <p className="text-lg text-gray-500 dark:text-gray-400">
                 لم يتم العثور على نتائج تطابق بحثك.
               </p>
             </div>
           )}
-
-          {totalPages > 1 && (
-            <div className="mt-12 flex justify-center">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </div>
-          )}
+          
+          <div className="text-center py-10">
+            {loading && books.length > 0 && <p className="animate-pulse">جاري تحميل المزيد...</p>}
+            {!hasMore && books.length > 0 && <p>لقد وصلت إلى نهاية القائمة.</p>}
+          </div>
         </>
       )}
     </div>

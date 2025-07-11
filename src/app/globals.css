@@ -36,3 +36,6 @@ body {
 .fav-badge {
   @apply absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-purple-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center;
 }
+.chapter-content {
+  white-space: pre-wrap;
+}

@@ -1,41 +1,86 @@
 // src/context/AuthContext.jsx
 "use client";
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-// 1. نقوم بإنشاء السياق وتصديره مباشرة
 export const AuthContext = createContext({
   user: null,
-  login: (userData) => {},
+  login: (session) => {},
   logout: () => {},
+  updateUser: (newUserData) => {}, // دالة جديدة لتحديث المستخدم
+  isLoading: true,
 });
 
-// 2. نقوم بإنشاء وتصدير "الخطاف" المخصص لتسهيل الاستخدام
 export const useAuth = () => {
   return useContext(AuthContext);
 };
 
-// 3. نقوم بإنشاء وتصدير "المزود" الذي يحتوي على المنطق
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  const login = (userData) => {
-    setUser(userData);
-    // يمكنك توجيه المستخدم من هنا أو من الصفحة نفسها
-    // router.push('/'); 
+  useEffect(() => {
+    try {
+      const storedSession = localStorage.getItem('session');
+      if (storedSession) {
+        const session = JSON.parse(storedSession);
+        if (session && session.user) {
+          setUser(session.user);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to parse session from localStorage", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const login = (session) => {
+    try {
+      localStorage.setItem('session', JSON.stringify(session));
+      setUser(session.user);
+      router.push('/');
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to save session", error);
+    }
   };
 
   const logout = () => {
+    localStorage.removeItem('session');
     setUser(null);
-    router.push('/auth'); // توجيه المستخدم لصفحة الدخول عند تسجيل الخروج
+    router.push('/');
+  };
+
+  // --- الدالة الجديدة ---
+  // تقوم بتحديث بيانات المستخدم في الحالة وفي الـ localStorage
+  const updateUser = (newUserData) => {
+    setUser(currentUser => {
+      const updatedUser = { ...currentUser, ...newUserData };
+      
+      try {
+        const storedSession = localStorage.getItem('session');
+        if (storedSession) {
+          const session = JSON.parse(storedSession);
+          session.user = updatedUser;
+          localStorage.setItem('session', JSON.stringify(session));
+        }
+      } catch (error) {
+        console.error("Failed to update session in localStorage", error);
+      }
+      
+      return updatedUser;
+    });
   };
 
   const value = {
     user,
     login,
     logout,
+    updateUser, // إضافة الدالة الجديدة للسياق
+    isLoading,
   };
 
   return (

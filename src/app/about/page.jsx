@@ -1,6 +1,21 @@
 // src/app/about/page.jsx
 import React from 'react';
-import Link from 'next/link'; // استيراد Link للاستخدام في الزر
+import Link from 'next/link';
+
+// 1. مكون صغير لعرض كرت عضو الفريق
+const TeamMemberCard = ({ name, role, imageUrl }) => {
+  return (
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center">
+      <img
+        className="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-purple-200 dark:border-purple-700"
+        src={imageUrl}
+        alt={`صورة ${name}`}
+      />
+      <h3 className="text-xl font-bold text-gray-900 dark:text-white">{name}</h3>
+      <p className="text-purple-500 dark:text-purple-400 font-semibold">{role}</p>
+    </div>
+  );
+};
 
 const AboutPage = () => {
   return (
@@ -36,16 +51,24 @@ const AboutPage = () => {
             </p>
           </div>
 
-          {/* قيمنا */}
+          {/* 2. إضافة قسم فريق العمل الجديد */}
           <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 shadow-md">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">قيمنا</h2>
-            <ul className="text-lg text-gray-700 dark:text-gray-300 space-y-3 list-disc list-inside">
-              <li>الجودة في اختيار المحتوى</li>
-              <li>سهولة الوصول للمعرفة</li>
-              <li>دعم الكُتّاب والمؤلفين العرب</li>
-              <li>الابتكار في تقديم الخدمات الرقمية</li>
-              <li>الحفاظ على التراث الثقافي العربي ونشره</li>
-            </ul>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">فريق العمل</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <TeamMemberCard 
+                name=" ENG. Abd Elsabour" 
+                role="Back-End Developer"
+                imageUrl="https://ui-avatars.com/api/?name=Abd+Elsabour&background=1f2937&color=fff&size=128"
+              />
+              <TeamMemberCard 
+                name=" ENG. Youssef" 
+                role="Front-End Developer"
+                imageUrl="https://ui-avatars.com/api/?name=Youssef&background=8b5cf6&color=fff&size=128"
+              />
+            </div>
+            <p className="text-center mt-6 text-gray-600 dark:text-gray-400">
+              تمت برمجة وتطوير هذا الموقع بواسطة فريق من المهندسين الشغوفين بنشر المعرفة.
+            </p>
           </div>
 
           {/* دعوة للانضمام */}

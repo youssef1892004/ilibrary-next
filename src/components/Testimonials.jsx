@@ -2,14 +2,14 @@
 "use client";
 
 import React from 'react';
-// تأكد أن الاستدعاء هكذا (بدون أقواس)
 import TestimonialCard from './TestimonialCard';
 import { useLanguage } from '@/context/LanguageContext';
 
+// 1. إزالة خاصية `avatar` من البيانات
 const testimonialsData = [
-  { id: 1, avatar: "/avatars/user1.jpg", name: "طيب", role: "@tayeb" },
-  { id: 2, avatar: "/avatars/user2.jpg", name: "سارة", role: "@sara" },
-  { id: 3, avatar: "/avatars/user3.jpg", name: "علي", role: "@ali" }
+  { id: 1, name: "طيب", role: "@tayeb" },
+  { id: 2, name: "سارة", role: "@sara" },
+  { id: 3, name: "علي", role: "@ali" }
 ];
 
 const Testimonials = () => {
@@ -31,7 +31,6 @@ const Testimonials = () => {
                     {testimonialsData.map((testimonial) => (
                         <TestimonialCard
                             key={testimonial.id}
-                            avatar={testimonial.avatar}
                             name={testimonial.name}
                             role={testimonial.role}
                             text={t[`testimonial${testimonial.id}`] || "تجربة قراءة رائعة ومكتبة ثرية بالمحتوى المفيد."}

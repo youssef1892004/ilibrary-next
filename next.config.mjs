@@ -1,3 +1,5 @@
+// next.config.mjs
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -8,9 +10,27 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com',
+        port: '',
+        pathname: '/api/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.gravatar.com',
+        port: '',
+        pathname: '/avatar/**',
+      },
+      // --- الإضافة الجديدة هنا ---
+      {
+        protocol: 'https',
+        hostname: 'infos-it.fr',
+        port: '',
+        pathname: '/wp-content/uploads/**',
+      },
     ],
   },
 };
 
-// تم تعديل هذا السطر ليستخدم صيغة ES Modules الصحيحة
 export default nextConfig;

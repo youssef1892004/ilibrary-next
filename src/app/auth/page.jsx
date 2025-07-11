@@ -2,10 +2,16 @@
 "use client";
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaEnvelope, FaLock, FaUser, FaBookReader } from 'react-icons/fa';
 import './AuthPage.css';
+import { useAuth } from '@/context/AuthContext';
+
+// دالة بسيطة للتحقق من صيغة البريد الإلكتروني
+const validateEmail = (email) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(String(email).toLowerCase());
+};
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,18 +20,33 @@ const AuthPage = () => {
     email: '',
     password: '',
   });
-  const [error, setError] = useState('');
+  // 1. استخدام حالة لتخزين الأخطاء لكل حقل + خطأ عام
+  const [errors, setErrors] = useState({
+    email: '',
+    general: ''
+  });
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    // 2. مسح الخطأ عند بدء الكتابة
+    if (errors.general || errors.email) {
+      setErrors({ email: '', general: '' });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setErrors({ email: '', general: '' }); // إعادة تعيين الأخطأ قبل كل محاولة
+
+    // 3. التحقق من صيغة البريد الإلكتروني أولاً
+    if (!validateEmail(formData.email)) {
+      setErrors({ ...errors, email: 'الرجاء إدخال بريد إلكتروني صحيح.' });
+      return; // إيقاف التنفيذ إذا كان الإيميل غير صحيح
+    }
+
     setLoading(true);
 
     const endpoint = isLogin 
@@ -49,21 +70,20 @@ const AuthPage = () => {
         throw new Error(data.message || 'حدث خطأ ما');
       }
 
-      // في حالة النجاح، يتم حفظ بيانات الجلسة وتوجيه المستخدم
       if (data.session) {
-        localStorage.setItem('session', JSON.stringify(data.session));
-        router.push('/'); // توجيه للصفحة الرئيسية
-        router.refresh(); // تحديث الصفحة لإظهار حالة المستخدم الجديدة في الـ Navbar
+        login(data.session);
+      } else {
+        throw new Error('لم يتم استلام بيانات الجلسة من الخادم.');
       }
 
     } catch (err) {
       const errorMessage = err.message;
       if (errorMessage.includes('Invalid email or password')) {
-        setError('البريد الإلكتروني أو كلمة المرور غير صحيحة.');
+        setErrors({ ...errors, general: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.' });
       } else if (errorMessage.includes('already in use')) {
-        setError('هذا البريد الإلكتروني مسجل بالفعل.');
+        setErrors({ ...errors, general: 'هذا البريد الإلكتروني مسجل بالفعل.' });
       } else {
-        setError('حدث خطأ. يرجى المحاولة مرة أخرى.');
+        setErrors({ ...errors, general: 'حدث خطأ. يرجى المحاولة مرة أخرى.' });
       }
       console.error(err);
     } finally {
@@ -91,12 +111,16 @@ const AuthPage = () => {
             <FaEnvelope />
             <input type="email" name="email" placeholder="البريد الإلكتروني" value={formData.email} onChange={handleChange} required />
           </div>
+          {/* 4. عرض رسالة خطأ الإيميل هنا */}
+          {errors.email && <p className="error-message">{errors.email}</p>}
+
           <div className="input-group">
             <FaLock />
             <input type="password" name="password" placeholder="كلمة المرور" value={formData.password} onChange={handleChange} required />
           </div>
           
-          {error && <p className="error-message">{error}</p>}
+          {/* 5. عرض رسالة الخطأ العامة هنا */}
+          {errors.general && <p className="error-message">{errors.general}</p>}
           
           <button type="submit" className="auth-button" disabled={loading}>
             {loading ? 'جاري...' : (isLogin ? 'تسجيل الدخول' : 'إنشاء حساب')}
@@ -106,7 +130,7 @@ const AuthPage = () => {
         <div className="auth-footer">
           <p>
             {isLogin ? 'ليس لديك حساب؟' : 'لديك حساب بالفعل؟'}
-            <button onClick={() => setIsLogin(!isLogin)} className="switch-button">
+            <button onClick={() => { setIsLogin(!isLogin); setErrors({ email: '', general: '' }); }} className="switch-button">
               {isLogin ? 'إنشاء حساب' : 'تسجيل الدخول'}
             </button>
           </p>
