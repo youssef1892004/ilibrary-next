@@ -7,37 +7,28 @@ import BookCard from './BookCard';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 
-// 1. الاستعلام النهائي: يجلب قائمة الكتب وقائمة المؤلفين في طلب واحد
-const GET_BOOKS_AND_AUTHORS = gql`
-  query GetBooksAndAuthors {
-    ilibarary_Book(limit: 10, order_by: { publication_date: desc }) {
+// 1. الاستعلام الصحيح بناءً على الـ schema الجديدة
+const GET_LATEST_BOOKS = gql`
+  query GetLatestBooks {
+    libaray_Book(limit: 10, order_by: { publicationDate: desc }) {
       id
       title
-      cover_URL
-      author_id
-    }
-    ilibarary_Autor {
-      id
-      name
+      coverImage
+      # جلب العلاقة مع المؤلف
+      Book_Author {
+        name
+      }
+      # جلب العلاقة مع الصنف
+      book_category {
+        name
+      }
     }
   }
 `;
 
 const LatestBooks = () => {
   const { t } = useLanguage();
-  const { loading, error, data } = useQuery(GET_BOOKS_AND_AUTHORS);
-
-  // 2. استخدام useMemo لربط البيانات بكفاءة
-  // هذه الدالة ستقوم بإنشاء خريطة للمؤلفين لسهولة الوصول إليهم
-  const authorsMap = useMemo(() => {
-    if (!data?.ilibarary_Autor) return new Map();
-    
-    const map = new Map();
-    data.ilibarary_Autor.forEach(author => {
-      map.set(author.id, author.name);
-    });
-    return map;
-  }, [data?.ilibarary_Autor]);
+  const { loading, error, data } = useQuery(GET_LATEST_BOOKS);
 
   if (loading) {
     return (
@@ -50,17 +41,17 @@ const LatestBooks = () => {
   }
 
   if (error) {
-    console.error("ApolloError final:", error);
+    console.error("ApolloError in LatestBooks:", error);
     return (
       <section className="py-16 bg-white dark:bg-gray-800">
         <div className="container mx-auto px-4 text-center text-red-500">
-          <p>حدث خطأ أثناء جلب البيانات. يرجى المحاولة مرة أخرى.</p>
+          <p>حدث خطأ أثناء جلب البيانات. يرجى التأكد من صلاحيات الوصول في Hasura.</p>
         </div>
       </section>
     );
   }
 
-  const latestBooks = data?.ilibarary_Book || [];
+  const latestBooks = data?.libaray_Book || [];
 
   return (
     <section id="latest-books" className="py-16 bg-white dark:bg-gray-800">
@@ -78,9 +69,9 @@ const LatestBooks = () => {
         <div className="relative">
           <div className="flex overflow-x-auto scrollbar-hide pb-4 -mx-4 sm:-mx-6 lg:-mx-8">
             <div className="flex flex-nowrap gap-6 px-4 sm:px-6 lg:px-8">
-              {latestBooks.filter(Boolean).map((book) => {
-                // 3. البحث عن اسم الكاتب باستخدام الخريطة
-                const authorName = authorsMap.get(book.author_id);
+              {latestBooks.map((book) => {
+                // 2. تمرير البيانات الصحيحة لبطاقة الكتاب
+                const authorName = book.Book_Author?.[0]?.name;
                 return (
                   <div key={book.id} className="w-72 flex-shrink-0">
                     <BookCard book={book} authorName={authorName} />

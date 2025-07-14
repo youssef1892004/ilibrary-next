@@ -8,10 +8,10 @@ import Image from 'next/image';
 import BookCard from '@/components/BookCard';
 import { FaBook } from 'react-icons/fa';
 
-// 1. استعلام لجلب تفاصيل الكاتب (بدون كتبه)
+// الاستعلام الأول: لجلب تفاصيل المؤلف فقط
 const GET_WRITER_DETAILS = gql`
   query GetWriterDetails($id: uuid!) {
-    ilibarary_Autor_by_pk(id: $id) {
+    libaray_Autor_by_pk(id: $id) {
       id
       name
       image_url
@@ -21,42 +21,45 @@ const GET_WRITER_DETAILS = gql`
   }
 `;
 
-// 2. استعلام منفصل لجلب كتب الكاتب باستخدام author_id
-const GET_BOOKS_BY_AUTHOR = gql`
-  query GetBooksByAuthor($authorId: uuid!) {
-    ilibarary_Book(where: { author_id: { _eq: $authorId } }, order_by: {publication_date: desc}) {
+// الاستعلام الثاني: لجلب كتب المؤلف بناءً على الـ ID
+const GET_BOOKS_FOR_AUTHOR = gql`
+  query GetBooksForAuthor($authorId: uuid!) {
+    libaray_Book(where: {author_id: {_eq: $authorId}}, order_by: {publicationDate: desc}) {
       id
       title
-      cover_URL
-      author_id
+      coverImage
+      Book_Author {
+        name
+      }
+      book_category {
+        name
+      }
     }
   }
 `;
-
 
 const WriterProfilePage = () => {
   const params = useParams();
   const writerId = params.id;
 
-  // 3. جلب بيانات الكاتب أولاً
+  // تنفيذ الاستعلام الأول
   const { loading: writerLoading, error: writerError, data: writerData } = useQuery(GET_WRITER_DETAILS, {
     variables: { id: writerId },
     skip: !writerId,
   });
 
-  const writer = writerData?.ilibarary_Autor_by_pk;
-
-  // 4. جلب كتب الكاتب في طلب منفصل، فقط بعد التأكد من وجود writerId
-  const { loading: booksLoading, error: booksError, data: booksData } = useQuery(GET_BOOKS_BY_AUTHOR, {
+  // تنفيذ الاستعلام الثاني
+  const { loading: booksLoading, error: booksError, data: booksData } = useQuery(GET_BOOKS_FOR_AUTHOR, {
     variables: { authorId: writerId },
     skip: !writerId,
   });
 
-  const books = booksData?.ilibarary_Book || [];
+  const writer = writerData?.libaray_Autor_by_pk;
+  const books = booksData?.libaray_Book || [];
+
   const loading = writerLoading || booksLoading;
   const error = writerError || booksError;
 
-  // عرض حالة التحميل
   if (loading) {
     return (
       <div className="container mx-auto text-center py-20">
@@ -65,23 +68,20 @@ const WriterProfilePage = () => {
     );
   }
 
-  // عرض حالة الخطأ
   if (error) {
-    console.error("ApolloError fetching writer details:", error);
+    console.error("ApolloError writer/book fetch:", error);
     return (
       <div className="container mx-auto text-center py-20 text-red-500">
-        <p className="text-xl">عفواً، حدث خطأ أثناء جلب بيانات الكاتب.</p>
+        <p className="text-xl font-bold">عفواً، حدث خطأ أثناء جلب البيانات.</p>
         <p>الرسالة: {error.message}</p>
       </div>
     );
   }
 
-  // في حالة عدم العثور على الكاتب
   if (!writer) {
     return (
       <div className="container mx-auto text-center py-20">
         <h1 className="text-3xl font-bold">الكاتب غير موجود</h1>
-        <p className="mt-4">عفواً، لم نتمكن من العثور على الكاتب الذي تبحث عنه.</p>
       </div>
     );
   }
@@ -89,8 +89,6 @@ const WriterProfilePage = () => {
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="container mx-auto px-4 py-12">
-        
-        {/* --- قسم رأس الصفحة: صورة ومعلومات الكاتب --- */}
         <header className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-12">
           <div className="flex-shrink-0">
             <Image
@@ -106,24 +104,27 @@ const WriterProfilePage = () => {
               {writer.name}
             </h1>
             <div className="mt-4 pt-2 border-t border-gray-200 dark:border-gray-700 inline-block">
-                <p className="text-lg text-gray-600 dark:text-gray-400">
-                    {writer.bio || "لا توجد نبذة تعريفية متاحة لهذا الكاتب."}
-                </p>
+              <p className="text-lg text-gray-600 dark:text-gray-400">
+                {writer.bio || "لا توجد نبذة تعريفية متاحة لهذا الكاتب."}
+              </p>
             </div>
           </div>
         </header>
 
-        {/* --- قسم أعمال الكاتب --- */}
         <section>
           <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
             <FaBook className="text-purple-500" />
             <span className="text-gray-800 dark:text-gray-200">أعمال الكاتب ({writer.book_num || books.length})</span>
           </h2>
           
-          {books && books.length > 0 ? (
+          {books.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {books.map((book) => (
-                <BookCard key={book.id} book={book} authorName={writer.name} />
+                <BookCard 
+                  key={book.id} 
+                  book={book} 
+                  authorName={writer.name} 
+                />
               ))}
             </div>
           ) : (
@@ -132,7 +133,6 @@ const WriterProfilePage = () => {
             </div>
           )}
         </section>
-
       </div>
     </div>
   );

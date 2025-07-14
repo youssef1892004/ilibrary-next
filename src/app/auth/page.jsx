@@ -7,57 +7,52 @@ import { FaEnvelope, FaLock, FaUser, FaBookReader } from 'react-icons/fa';
 import './AuthPage.css';
 import { useAuth } from '@/context/AuthContext';
 
-// دالة بسيطة للتحقق من صيغة البريد الإلكتروني
-const validateEmail = (email) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(String(email).toLowerCase());
-};
+// لم نعد بحاجة إلى GraphQL mutations هنا، سنستخدم fetch
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-  });
-  // 1. استخدام حالة لتخزين الأخطاء لكل حقل + خطأ عام
-  const [errors, setErrors] = useState({
-    email: '',
-    general: ''
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const { login } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    // 2. مسح الخطأ عند بدء الكتابة
-    if (errors.general || errors.email) {
-      setErrors({ email: '', general: '' });
-    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors({ email: '', general: '' }); // إعادة تعيين الأخطأ قبل كل محاولة
-
-    // 3. التحقق من صيغة البريد الإلكتروني أولاً
-    if (!validateEmail(formData.email)) {
-      setErrors({ ...errors, email: 'الرجاء إدخال بريد إلكتروني صحيح.' });
-      return; // إيقاف التنفيذ إذا كان الإيميل غير صحيح
-    }
-
+    setError('');
     setLoading(true);
 
-    const endpoint = isLogin 
-      ? 'https://libararyauth-af96ef3792e3.hosted.ghaymah.systems/signin/email-password'
-      : 'https://libararyauth-af96ef3792e3.hosted.ghaymah.systems/signup/email-password';
+    // ---  المنطق الجديد بناءً على الـ REST API ---
+    const baseUrl = 'https://graphql-333f98f9a304.hosted.ghaymah.systems/api/rest';
+    
+    // ملاحظة: تأكد من أن هذه هي المسارات الصحيحة التي قمت بإنشائها في Hasura
+    const REGISTER_PATH = '/users'; //  بناءً على صورتك، هذا هو مسار إضافة المستخدم
+    const LOGIN_PATH = '/login';   //  هذا لا يزال بحاجة إلى إنشائه بنفس الطريقة
 
+    const endpoint = isLogin ? `${baseUrl}${LOGIN_PATH}` : `${baseUrl}${REGISTER_PATH}`;
+    
+    // بناء الـ payload ليناسب الـ API الخاص بك
     const payload = isLogin
       ? { email: formData.email, password: formData.password }
-      : { email: formData.email, password: formData.password, options: { displayName: formData.name } };
+      : { 
+          // هذا الـ payload لعملية الإضافة
+          object: {
+            displayName: formData.name,
+            email: formData.email,
+            passwordHash: formData.password // أنت أكدت أن Hasura يهتم بالتشفير
+          }
+        };
 
     try {
+      if (isLogin) {
+          throw new Error("عملية تسجيل الدخول لم يتم إنشاؤها بعد. الرجاء إنشاء REST endpoint لـ Login.");
+      }
+
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -67,24 +62,15 @@ const AuthPage = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'حدث خطأ ما');
+        throw new Error(data?.message || 'حدث خطأ من الخادم.');
       }
-
-      if (data.session) {
-        login(data.session);
-      } else {
-        throw new Error('لم يتم استلام بيانات الجلسة من الخادم.');
-      }
+      
+      // في حالة نجاح إنشاء الحساب
+      alert('تم إنشاء حسابك بنجاح! يمكنك الآن تسجيل الدخول.');
+      setIsLogin(true); // تحويل الواجهة لصفحة تسجيل الدخول
 
     } catch (err) {
-      const errorMessage = err.message;
-      if (errorMessage.includes('Invalid email or password')) {
-        setErrors({ ...errors, general: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.' });
-      } else if (errorMessage.includes('already in use')) {
-        setErrors({ ...errors, general: 'هذا البريد الإلكتروني مسجل بالفعل.' });
-      } else {
-        setErrors({ ...errors, general: 'حدث خطأ. يرجى المحاولة مرة أخرى.' });
-      }
+      setError(err.message || 'فشل الاتصال بالخادم.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -103,25 +89,16 @@ const AuthPage = () => {
         <form className="auth-form" onSubmit={handleSubmit}>
           {!isLogin && (
             <div className="input-group">
-              <FaUser />
-              <input type="text" name="name" placeholder="الاسم الكامل" value={formData.name} onChange={handleChange} required />
+              <FaUser /><input type="text" name="name" placeholder="الاسم الكامل" value={formData.name} onChange={handleChange} required />
             </div>
           )}
           <div className="input-group">
-            <FaEnvelope />
-            <input type="email" name="email" placeholder="البريد الإلكتروني" value={formData.email} onChange={handleChange} required />
+            <FaEnvelope /><input type="email" name="email" placeholder="البريد الإلكتروني" value={formData.email} onChange={handleChange} required />
           </div>
-          {/* 4. عرض رسالة خطأ الإيميل هنا */}
-          {errors.email && <p className="error-message">{errors.email}</p>}
-
           <div className="input-group">
-            <FaLock />
-            <input type="password" name="password" placeholder="كلمة المرور" value={formData.password} onChange={handleChange} required />
+            <FaLock /><input type="password" name="password" placeholder="كلمة المرور" value={formData.password} onChange={handleChange} required />
           </div>
-          
-          {/* 5. عرض رسالة الخطأ العامة هنا */}
-          {errors.general && <p className="error-message">{errors.general}</p>}
-          
+          {error && <p className="error-message">{error}</p>}
           <button type="submit" className="auth-button" disabled={loading}>
             {loading ? 'جاري...' : (isLogin ? 'تسجيل الدخول' : 'إنشاء حساب')}
           </button>
@@ -130,7 +107,7 @@ const AuthPage = () => {
         <div className="auth-footer">
           <p>
             {isLogin ? 'ليس لديك حساب؟' : 'لديك حساب بالفعل؟'}
-            <button onClick={() => { setIsLogin(!isLogin); setErrors({ email: '', general: '' }); }} className="switch-button">
+            <button type="button" onClick={() => { setIsLogin(!isLogin); setError(''); }} className="switch-button">
               {isLogin ? 'إنشاء حساب' : 'تسجيل الدخول'}
             </button>
           </p>

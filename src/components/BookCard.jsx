@@ -3,12 +3,13 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image'; // 1. استيراد مكون الصور من Next.js
+import Image from 'next/image';
 import { FaHeart, FaRegHeart, FaBookOpen, FaUserAlt, FaTag } from 'react-icons/fa';
 import { useFavorites } from '@/context/FavoritesContext';
 import { useLanguage } from '@/context/LanguageContext';
 
-const BookCard = ({ book, authorName }) => {
+// --- تم تعديل المكون ليقبل authorName كخاصية اختيارية ---
+const BookCard = ({ book, authorName: authorNameFromProp }) => {
   if (!book) {
     return null; 
   }
@@ -17,13 +18,17 @@ const BookCard = ({ book, authorName }) => {
   const { t } = useLanguage();
   const isFavorite = favorites.some((fav) => fav.id === book.id);
 
+  // إذا تم تمرير اسم المؤلف، استخدمه. وإلا، ابحث عنه داخل كائن الكتاب.
+  const authorName = authorNameFromProp || book.Book_Author?.[0]?.name;
+  const categoryName = book.book_category?.[0]?.name;
+
   const handleFavoriteClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
     if (isFavorite) {
       removeFavorite(book.id);
     } else {
-      addFavorite({ ...book, author: authorName }); 
+      addFavorite({ ...book, authorName, categoryName }); 
     }
   };
 
@@ -31,10 +36,8 @@ const BookCard = ({ book, authorName }) => {
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col h-full transition-shadow duration-300 hover:shadow-2xl group">
       <Link href={`/books/${book.id}`} className="block relative">
         <div className="aspect-[3/4] bg-gray-200 dark:bg-gray-700">
-          {/* 2. استبدال <img> بـ <Image /> */}
-          {/* سيتم تحميل هذه الصورة تلقائيًا فقط عندما تقترب من الظهور على الشاشة */}
           <Image
-            src={book.cover_URL || 'https://placehold.co/250x375/e2e8f0/4a5568?text=No+Image'}
+            src={book.coverImage || 'https://placehold.co/250x375/e2e8f0/4a5568?text=No+Image'}
             alt={book.title}
             width={250}
             height={375}
@@ -49,12 +52,21 @@ const BookCard = ({ book, authorName }) => {
             {book.title}
           </h3>
         </Link>
+
+        {authorName && (
+          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
+            <FaUserAlt size={12} />
+            <p className="text-sm font-medium truncate">{authorName}</p>
+          </div>
+        )}
         
-        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
-          <FaUserAlt size={12} />
-          <p className="text-sm font-medium truncate">{authorName || 'غير معروف'}</p>
-        </div>
-        
+        {categoryName && (
+            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-xs mb-3">
+                <FaTag size={12}/>
+                <span>{categoryName}</span>
+            </div>
+        )}
+
         <div className="flex-grow"></div> 
 
         <div className="mt-4 flex items-center gap-2">

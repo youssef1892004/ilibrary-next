@@ -8,20 +8,28 @@ import { FaArrowLeft, FaArrowRight, FaBook, FaMinus, FaPlus, FaAlignRight, FaAli
 import Link from 'next/link';
 import { useReadingProgress } from '@/context/ReadingProgressContext';
 
-const GET_CHAPTER_DETAILS = gql`
-  query GetChapterDetails($id: uuid!) {
-    ilibarary_Chapter_by_pk(id: $id) {
+// الاستعلام الأول: لجلب محتوى الفصل ومعرّف الكتاب (book__id)
+const GET_CHAPTER_CONTENT = gql`
+  query GetChapterContent($id: uuid!) {
+    libaray_Chapter_by_pk(id: $id) {
       id
       title
       content
       chapter_num
-      Book {
+      book__id
+    }
+  }
+`;
+
+// الاستعلام الثاني: لجلب بيانات الكتاب والفصول الأخرى للتنقل
+const GET_BOOK_NAVIGATION = gql`
+  query GetBookNavigation($bookId: uuid!) {
+    libaray_Book_by_pk(id: $bookId) {
+      id
+      title
+      Bookchapters(order_by: { chapter_num: asc }) {
         id
-        title
-        Chapters(order_by: { chapter_num: asc }) {
-          id
-          chapter_num
-        }
+        chapter_num
       }
     }
   }
@@ -36,13 +44,26 @@ const ReadPage = () => {
   const [isNavVisible, setIsNavVisible] = useState(true);
   const lastScrollY = useRef(0);
 
-  const { loading, error, data } = useQuery(GET_CHAPTER_DETAILS, {
+  // تنفيذ الاستعلام الأول
+  const { data: chapterData, loading: chapterLoading, error: chapterError } = useQuery(GET_CHAPTER_CONTENT, {
     variables: { id: params.id },
     skip: !params.id,
   });
 
-  const chapter = data?.ilibarary_Chapter_by_pk;
-  const book = chapter?.Book;
+  const chapter = chapterData?.libaray_Chapter_by_pk;
+  const bookId = chapter?.book__id;
+
+  // تنفيذ الاستعلام الثاني (فقط بعد الحصول على bookId من الاستعلام الأول)
+  const { data: bookData, loading: bookLoading, error: bookError } = useQuery(GET_BOOK_NAVIGATION, {
+    variables: { bookId: bookId },
+    skip: !bookId,
+  });
+
+  const book = bookData?.libaray_Book_by_pk;
+  const allChapters = book?.Bookchapters || [];
+  
+  const loading = chapterLoading || bookLoading;
+  const error = chapterError || bookError;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -84,28 +105,35 @@ const ReadPage = () => {
   if (loading) {
     return <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900"><p className="text-xl animate-pulse">جاري تحميل الفصل...</p></div>;
   }
-  if (error || !chapter) {
+  if (error) {
     return <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900"><h1 className="text-3xl font-bold text-red-500">الفصل غير موجود أو حدث خطأ.</h1></div>;
   }
+  if (!chapter) {
+    return <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900"><h1 className="text-3xl font-bold">لم يتم العثور على الفصل.</h1></div>;
+  }
 
-  const allChapters = chapter.Book.Chapters;
   const currentIndex = allChapters.findIndex(ch => ch.id === chapter.id);
   const prevChapter = currentIndex > 0 ? allChapters[currentIndex - 1] : null;
   const nextChapter = currentIndex < allChapters.length - 1 ? allChapters[currentIndex + 1] : null;
 
   const renderContent = () => {
+    const content = chapter?.content;
+    if (!content) {
+      return <p className="text-gray-400">لا يوجد محتوى لعرضه في هذا الفصل.</p>;
+    }
     try {
-      if (typeof chapter.content === 'string') {
-        const parsedContent = JSON.parse(chapter.content);
-        return <>{parsedContent}</>;
+      if (typeof content === 'string') {
+        const parsedContent = JSON.parse(content);
+        return parsedContent ? <>{parsedContent}</> : <p className="text-gray-400">لا يوجد محتوى لعرضه.</p>;
       }
-      if (Array.isArray(chapter.content)) {
-        return chapter.content.map((paragraph, index) => <p key={index} className="mb-6">{paragraph}</p>);
+      if (Array.isArray(content)) {
+        if (content.length === 0) return <p className="text-gray-400">لا يوجد محتوى لعرضه في هذا الفصل.</p>;
+        return content.map((paragraph, index) => <p key={index} className="mb-6">{paragraph}</p>);
       }
     } catch (e) {
-      return <p>{chapter.content}</p>;
+      return <p>{content}</p>;
     }
-    return <p className="text-red-500">محتوى هذا الفصل غير قابل للعرض.</p>;
+    return <p className="text-red-500">صيغة محتوى هذا الفصل غير مدعومة.</p>;
   };
 
   return (
@@ -143,14 +171,12 @@ const ReadPage = () => {
 
       <main className="container mx-auto max-w-3xl px-4 sm:px-6 pt-24 pb-24">
         <header className="mb-10 text-center">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
-                {chapter.title}
-            </h1>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">{chapter.title}</h1>
             <p className="text-md text-gray-500 dark:text-gray-400 mt-2">الفصل رقم {chapter.chapter_num}</p>
         </header>
 
         <article 
-          className={`chapter-content select-none bg-white dark:bg-gray-800 p-8 sm:p-12 rounded-lg shadow-lg transition-all duration-300 ${textAlign}`}
+          className={`chapter-content select-none bg-white dark:bg-gray-800 p-8 sm:p-12 rounded-lg shadow-lg ${textAlign}`}
           style={{ fontSize: `${fontSize}px`, lineHeight: 1.8 }}
         >
           {renderContent()}
@@ -167,7 +193,7 @@ const ReadPage = () => {
             ) : <div className="w-36"></div>}
             
             <span className="font-bold text-gray-700 dark:text-gray-300 truncate px-4">
-              {chapter.Book.title}
+              {book?.title}
             </span>
 
             {prevChapter ? (

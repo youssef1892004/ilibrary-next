@@ -2,15 +2,35 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
-// الرابط الخاص بالـ API
 const httpLink = createHttpLink({
   uri: 'https://graphql-333f98f9a304.hosted.ghaymah.systems/v1/graphql',
 });
 
-// هذا هو الجزء الأهم: إضافة الهيدر (Header) مع كل طلب
 const authLink = setContext((_, { headers }) => {
-  // إرجاع الهيدر مع تحديد دور "public"
-  // هذا يسمح بالوصول إلى البيانات التي تم تحديد صلاحياتها للعامة في Hasura
+  // هذا الكود يعمل فقط في المتصفح
+  if (typeof window !== 'undefined') {
+    try {
+      const storedSession = localStorage.getItem('session');
+      if (storedSession) {
+        const session = JSON.parse(storedSession);
+        const token = session?.accessToken;
+
+        // إذا وجدنا توكن، أرسله مع الطلب
+        if (token) {
+          return {
+            headers: {
+              ...headers,
+              authorization: `Bearer ${token}`,
+            }
+          };
+        }
+      }
+    } catch (error) {
+      console.error("Could not parse session, proceeding as guest:", error);
+    }
+  }
+
+  // إذا لم نجد توكن، استخدم صلاحيات الزائر
   return {
     headers: {
       ...headers,
@@ -21,7 +41,6 @@ const authLink = setContext((_, { headers }) => {
 
 const createApolloClient = () => {
   return new ApolloClient({
-    // دمج رابط المصادقة مع رابط الـ HTTP
     link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
   });

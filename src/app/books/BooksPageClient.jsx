@@ -9,13 +9,13 @@ import { FaSearch } from 'react-icons/fa';
 
 const BOOKS_PER_PAGE = 20;
 
-// 1. تعديل الاستعلام لإزالة aggregate التي قد تسبب مشكلة في الصلاحيات
-const GET_BOOKS_WITH_SEARCH = gql`
-  query GetBooksWithSearch($limit: Int!, $offset: Int!, $search: String!) {
-    ilibarary_Book(
+// استعلام GraphQL الصحيح بناءً على الـ schema الجديدة
+const GET_BOOKS_WITH_RELATIONS = gql`
+  query GetBooksWithRelations($limit: Int!, $offset: Int!, $search: String!) {
+    libaray_Book(
       limit: $limit,
       offset: $offset,
-      order_by: { publication_date: desc },
+      order_by: { publicationDate: desc },
       where: {
         _or: [
           { title: { _ilike: $search } },
@@ -25,12 +25,13 @@ const GET_BOOKS_WITH_SEARCH = gql`
     ) {
       id
       title
-      cover_URL
-      author_id
-    }
-    ilibarary_Autor {
-      id
-      name
+      coverImage
+      Book_Author {
+        name
+      }
+      book_category {
+        name
+      }
     }
   }
 `;
@@ -41,7 +42,6 @@ const BooksPageClient = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [hasMore, setHasMore] = useState(true);
 
-  // Debouncing لتأخير البحث
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
@@ -49,40 +49,29 @@ const BooksPageClient = () => {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  const { loading, error, data, fetchMore } = useQuery(GET_BOOKS_WITH_SEARCH, {
+  const { loading, error, data, fetchMore } = useQuery(GET_BOOKS_WITH_RELATIONS, {
     variables: {
       limit: BOOKS_PER_PAGE,
       offset: 0,
       search: `%${debouncedSearchTerm}%`
     },
     onCompleted: (data) => {
-      // إذا كانت الدفعة الأولى من الكتب أقل من الحد الأقصى، فهذا يعني أنه لا يوجد المزيد
-      if (data.ilibarary_Book.length < BOOKS_PER_PAGE) {
+      if (data.libaray_Book.length < BOOKS_PER_PAGE) {
         setHasMore(false);
       } else {
         setHasMore(true);
       }
     },
-    // إعادة تعيين الحالة عند تغيير البحث
     notifyOnNetworkStatusChange: true,
   });
 
-  // إعادة تعيين hasMore عند بدء بحث جديد
   useEffect(() => {
     setHasMore(true);
   }, [debouncedSearchTerm]);
 
-  const authorsMap = useMemo(() => {
-    if (!data?.ilibarary_Autor) return new Map();
-    const map = new Map();
-    data.ilibarary_Autor.forEach(author => map.set(author.id, author.name));
-    return map;
-  }, [data?.ilibarary_Autor]);
-
-  const books = data?.ilibarary_Book || [];
+  const books = data?.libaray_Book || [];
 
   const loadMore = useCallback(() => {
-    // لا تقم بالجلب إذا كان هناك طلب قيد التنفيذ أو لا يوجد المزيد من البيانات
     if (loading || !hasMore) return;
 
     fetchMore({
@@ -90,25 +79,21 @@ const BooksPageClient = () => {
         offset: books.length
       },
       updateQuery: (prev, { fetchMoreResult }) => {
-        if (!fetchMoreResult || fetchMoreResult.ilibarary_Book.length === 0) {
-          setHasMore(false); // لا يوجد المزيد من الكتب
+        if (!fetchMoreResult || fetchMoreResult.libaray_Book.length === 0) {
+          setHasMore(false);
           return prev;
         }
-        
-        // إذا كانت النتائج الجديدة أقل من المطلوب، فهذه هي النهاية
-        if (fetchMoreResult.ilibarary_Book.length < BOOKS_PER_PAGE) {
-            setHasMore(false);
+        if (fetchMoreResult.libaray_Book.length < BOOKS_PER_PAGE) {
+          setHasMore(false);
         }
-
         return {
           ...prev,
-          ilibarary_Book: [...prev.ilibarary_Book, ...fetchMoreResult.ilibarary_Book],
+          libaray_Book: [...prev.libaray_Book, ...fetchMoreResult.libaray_Book],
         };
       },
     });
   }, [loading, hasMore, books.length, fetchMore]);
 
-  // مراقبة التمرير
   useEffect(() => {
     const handleScroll = () => {
       if (window.innerHeight + document.documentElement.scrollTop < document.documentElement.offsetHeight - 500 || loading || !hasMore) {
@@ -126,7 +111,6 @@ const BooksPageClient = () => {
       <h1 className="text-4xl font-bold text-center mb-6 text-gray-900 dark:text-white">
         {t.allBooks || "جميع الكتب"}
       </h1>
-
       <div className="mb-12 max-w-2xl mx-auto">
         <div className="relative">
           <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
@@ -143,21 +127,20 @@ const BooksPageClient = () => {
       </div>
 
       {loading && books.length === 0 && <div className="text-center py-10"><p>جاري البحث...</p></div>}
-      {error && <div className="text-center py-10 text-red-500"><p>حدث خطأ في جلب البيانات. يرجى المحاولة مرة أخرى.</p></div>}
+      {error && <div className="text-center py-10 text-red-500"><p>حدث خطأ أثناء جلب البيانات. يرجى مراجعة صلاحيات الوصول في Hasura.</p></div>}
       
       {!error && (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {books.map((book) => {
-              const authorName = authorsMap.get(book.author_id);
-              return <BookCard key={`${book.id}-${book.title}`} book={book} authorName={authorName} />;
-            })}
+            {books.map((book) => (
+              <BookCard key={book.id} book={book} />
+            ))}
           </div>
           
           {books.length === 0 && !loading && (
             <div className="text-center py-20">
               <p className="text-lg text-gray-500 dark:text-gray-400">
-                لم يتم العثور على نتائج تطابق بحثك.
+                لم يتم العثور على كتب تطابق بحثك.
               </p>
             </div>
           )}

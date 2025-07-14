@@ -1,47 +1,55 @@
 // src/components/BookDetails.jsx
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { FaUserAlt, FaCalendarAlt, FaBook, FaListOl, FaBarcode, FaFileAlt, FaChevronDown } from 'react-icons/fa';
+import Image from 'next/image';
+import { FaUserAlt, FaCalendarAlt, FaBook, FaListOl, FaBarcode, FaFileAlt } from 'react-icons/fa';
 import { useLanguage } from '@/context/LanguageContext';
 
-// المكون الآن يستقبل الكتاب والكاتب بشكل منفصل
-const BookDetails = ({ book, author }) => {
+const BookDetails = ({ book }) => {
   const { t } = useLanguage();
-  const [isChaptersOpen, setIsChaptersOpen] = useState(false);
-  
-  const chapters = book.Chapters || [];
+
+  // Extract data from relationships according to the new schema
+  const author = book.Book_Author?.[0];
+  const category = book.book_category?.[0];
+  const chapters = book.Bookchapters || [];
 
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 mb-16">
         
         <div className="lg:col-span-1 flex justify-center">
-          <img
-            src={book.cover_URL || 'https://placehold.co/400x600/e2e8f0/4a5568?text=No+Image'}
+          <Image
+            src={book.coverImage || 'https://placehold.co/400x600/e2e8f0/4a5568?text=No+Image'}
             alt={book.title}
+            width={400}
+            height={600}
             className="w-full max-w-sm h-auto object-cover rounded-lg shadow-2xl"
-            onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x600/e2e8f0/4a5568?text=Error'; }}
           />
         </div>
 
         <div className="lg:col-span-2">
+          {category && (
+            <p className="text-purple-500 dark:text-purple-400 font-semibold mb-2">{category.name}</p>
+          )}
           <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-2">{book.title}</h1>
-          <div className="mb-6">
-            <Link href={`/writers/${author?.id || ''}`} className="text-xl text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors inline-flex items-center gap-2">
-              <FaUserAlt />
-              {/* عرض اسم الكاتب من المتغير author */}
-              <span>{author?.name || 'غير معروف'}</span>
-            </Link>
-          </div>
+          
+          {author && (
+            <div className="mb-6">
+              <Link href={`/writers/${author.id}`} className="text-xl text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors inline-flex items-center gap-2">
+                <FaUserAlt />
+                <span>{author.name || 'غير معروف'}</span>
+              </Link>
+            </div>
+          )}
           
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
             {book.description}
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
-              <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg"><FaCalendarAlt className="mx-auto text-purple-500 mb-1" /><p className="text-sm">تاريخ النشر</p><p className="font-bold">{book.publication_date || 'N/A'}</p></div>
+              <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg"><FaCalendarAlt className="mx-auto text-purple-500 mb-1" /><p className="text-sm">تاريخ النشر</p><p className="font-bold">{book.publicationDate || 'N/A'}</p></div>
               <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg"><FaFileAlt className="mx-auto text-purple-500 mb-1" /><p className="text-sm">عدد الصفحات</p><p className="font-bold">{book.total_pages || 'N/A'}</p></div>
               <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg"><FaBarcode className="mx-auto text-purple-500 mb-1" /><p className="text-sm">ISBN</p><p className="font-bold">{book.ISBN || 'N/A'}</p></div>
           </div>
