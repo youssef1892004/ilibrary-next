@@ -7,30 +7,25 @@ const httpLink = createHttpLink({
 });
 
 const authLink = setContext((_, { headers }) => {
-  // هذا الكود يعمل فقط في المتصفح
-  if (typeof window !== 'undefined') {
+  const storedSession = typeof window !== 'undefined' ? localStorage.getItem('session') : null;
+  
+  if (storedSession) {
     try {
-      const storedSession = localStorage.getItem('session');
-      if (storedSession) {
-        const session = JSON.parse(storedSession);
-        const token = session?.accessToken;
-
-        // إذا وجدنا توكن، أرسله مع الطلب
-        if (token) {
-          return {
-            headers: {
-              ...headers,
-              authorization: `Bearer ${token}`,
-            }
-          };
-        }
+      const session = JSON.parse(storedSession);
+      const token = session?.accessToken;
+      if (token) {
+        return {
+          headers: {
+            ...headers,
+            authorization: `Bearer ${token}`,
+          }
+        };
       }
-    } catch (error) {
-      console.error("Could not parse session, proceeding as guest:", error);
+    } catch (e) {
+      console.error("Could not parse session from localStorage", e);
     }
   }
 
-  // إذا لم نجد توكن، استخدم صلاحيات الزائر
   return {
     headers: {
       ...headers,
@@ -39,11 +34,9 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-const createApolloClient = () => {
-  return new ApolloClient({
-    link: authLink.concat(httpLink),
-    cache: new InMemoryCache(),
-  });
-};
+const client = new ApolloClient({
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache(),
+});
 
-export default createApolloClient;
+export default client;

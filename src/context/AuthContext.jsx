@@ -3,18 +3,9 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import client from '../lib/apollo'; // استيراد apollo client
 
-export const AuthContext = createContext({
-  user: null,
-  login: (session) => {},
-  logout: () => {},
-  updateUser: (newUserData) => {}, // دالة جديدة لتحديث المستخدم
-  isLoading: true,
-});
-
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -22,70 +13,47 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
+    // هذا الجزء يتحقق من وجود جلسة عند تحميل الصفحة لأول مرة
     try {
-      const storedSession = localStorage.getItem('session');
-      if (storedSession) {
-        const session = JSON.parse(storedSession);
-        if (session && session.user) {
-          setUser(session.user);
-        }
+      const session = JSON.parse(localStorage.getItem('session'));
+      if (session?.user && session?.accessToken) {
+        setUser(session.user);
       }
     } catch (error) {
-      console.error("Failed to parse session from localStorage", error);
+      console.error("Could not parse session from localStorage on initial load", error);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   const login = (session) => {
-    try {
-      localStorage.setItem('session', JSON.stringify(session));
-      setUser(session.user);
-      router.push('/');
-      router.refresh();
-    } catch (error) {
-      console.error("Failed to save session", error);
-    }
+    // ---  التعديل المطلوب هنا ---
+    // 1. مسح كل البيانات القديمة من localStorage بشكل كامل
+    localStorage.clear();
+
+    // 2. تخزين بيانات الجلسة الجديدة فقط
+    localStorage.setItem('session', JSON.stringify(session));
+
+    // 3. تحديث حالة المستخدم في التطبيق وإعادة تعيين Apollo Cache
+    setUser(session.user);
+    client.resetStore(); 
+    router.push('/');
+    router.refresh();
   };
 
   const logout = () => {
-    localStorage.removeItem('session');
+    // عند تسجيل الخروج، نقوم أيضًا بمسح كل شيء
+    localStorage.clear();
     setUser(null);
-    router.push('/');
-  };
-
-  // --- الدالة الجديدة ---
-  // تقوم بتحديث بيانات المستخدم في الحالة وفي الـ localStorage
-  const updateUser = (newUserData) => {
-    setUser(currentUser => {
-      const updatedUser = { ...currentUser, ...newUserData };
-      
-      try {
-        const storedSession = localStorage.getItem('session');
-        if (storedSession) {
-          const session = JSON.parse(storedSession);
-          session.user = updatedUser;
-          localStorage.setItem('session', JSON.stringify(session));
-        }
-      } catch (error) {
-        console.error("Failed to update session in localStorage", error);
-      }
-      
-      return updatedUser;
-    });
-  };
-
-  const value = {
-    user,
-    login,
-    logout,
-    updateUser, // إضافة الدالة الجديدة للسياق
-    isLoading,
+    client.resetStore();
+    router.push('/auth');
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => useContext(AuthContext);
