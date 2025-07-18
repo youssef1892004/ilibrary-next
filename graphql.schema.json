@@ -23026,6 +23026,180 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "favo_book",
+                            "description": "An array relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "libaray_Book_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "libaray_Book_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "libaray_Book_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "LIST",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "OBJECT",
+                                            "name": "libaray_Book",
+                                            "ofType": null
+                                        }
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "favo_book_aggregate",
+                            "description": "An aggregate relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "libaray_Book_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "libaray_Book_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "libaray_Book_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "libaray_Book_aggregate",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "id",
                             "description": null,
                             "args": [],
@@ -23605,6 +23779,26 @@
                             "defaultValue": null
                         },
                         {
+                            "name": "favo_book",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Book_bool_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "favo_book_aggregate",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Book_aggregate_bool_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
                             "name": "id",
                             "description": null,
                             "type": {
@@ -23688,6 +23882,16 @@
                             "type": {
                                 "kind": "SCALAR",
                                 "name": "uuid",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "favo_book",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Book_arr_rel_insert_input",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -24077,6 +24281,16 @@
                             "type": {
                                 "kind": "ENUM",
                                 "name": "order_by",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "favo_book_aggregate",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Book_aggregate_order_by",
                                 "ofType": null
                             },
                             "defaultValue": null

@@ -3,33 +3,36 @@
 
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/Navbar"; // استخدام مسار واحد وثابت
 import Footer from "@/components/Footer";
 import GlobalReview from "@/components/GlobalReview";
 
 const ConditionalLayout = ({ children }) => {
   const pathname = usePathname();
 
-  // الصفحات التي نريد إخفاء شريط التنقل والفوتر فيها
-  const noLayoutPages = ['/read'];
-
-  // التحقق مما إذا كانت الصفحة الحالية تبدأ بأحد الروابط الموجودة في المصفوفة
-  const shouldHideLayout = noLayoutPages.some(path => pathname.startsWith(path));
+  // --- تم دمج الشروط هنا ---
+  // سنقوم بإخفاء الـ Layout إذا كانت الصفحة هي /auth بالضبط
+  // أو إذا كانت تبدأ بـ /read (مثل /read/123)
+  const hideLayout = pathname === '/auth' || pathname.startsWith('/read');
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* إذا كانت shouldHideLayout تساوي false، قم بعرض الشريط */}
-      {!shouldHideLayout && <Navbar />}
+      {/* إذا لم تكن hideLayout صحيحة، قم بعرض الشريط */}
+      {!hideLayout && <Navbar />}
 
       {/* المحتوى الرئيسي للصفحة */}
-      <main className={`flex-grow ${!shouldHideLayout ? 'pt-20' : ''}`}>
+      {/* يتم إضافة padding-top فقط إذا كان الـ Navbar ظاهراً */}
+      <main className={`flex-grow ${!hideLayout ? 'pt-20' : ''}`}>
         {children}
       </main>
 
-      {/* إذا كانت shouldHideLayout تساوي false، قم بعرض الفوتر */}
-      {!shouldHideLayout && <Footer />}
-
-      <GlobalReview />
+      {/* إذا لم تكن hideLayout صحيحة، قم بعرض الفوتر و GlobalReview */}
+      {!hideLayout && (
+        <>
+          <Footer />
+          <GlobalReview />
+        </>
+      )}
     </div>
   );
 };

@@ -1,56 +1,54 @@
 // src/context/AuthContext.jsx
 "use client";
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import client from '../lib/apollo'; // استيراد apollo client
+// --- تأكد من وجود هذا السطر ---
+import client from '@/lib/apollo';
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    // هذا الجزء يتحقق من وجود جلسة عند تحميل الصفحة لأول مرة
     try {
-      const session = JSON.parse(localStorage.getItem('session'));
-      if (session?.user && session?.accessToken) {
+      const storedSession = localStorage.getItem('session');
+      if (storedSession) {
+        const session = JSON.parse(storedSession);
         setUser(session.user);
+      } else {
+        setUser(null);
       }
     } catch (error) {
-      console.error("Could not parse session from localStorage on initial load", error);
+      console.error("Failed to parse session from localStorage", error);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   const login = (session) => {
-    // ---  التعديل المطلوب هنا ---
-    // 1. مسح كل البيانات القديمة من localStorage بشكل كامل
-    localStorage.clear();
-
-    // 2. تخزين بيانات الجلسة الجديدة فقط
-    localStorage.setItem('session', JSON.stringify(session));
-
-    // 3. تحديث حالة المستخدم في التطبيق وإعادة تعيين Apollo Cache
-    setUser(session.user);
-    client.resetStore(); 
-    router.push('/');
-    router.refresh();
+    if (session && session.user && session.accessToken) {
+      localStorage.setItem('session', JSON.stringify(session));
+      setUser(session.user);
+      // --- وتأكد من وجود هذا السطر ---
+      client.resetStore();
+    }
   };
 
   const logout = () => {
-    // عند تسجيل الخروج، نقوم أيضًا بمسح كل شيء
-    localStorage.clear();
+    localStorage.removeItem('session');
     setUser(null);
+    // --- هذا السطر مهم أيضاً عند تسجيل الخروج ---
     client.resetStore();
-    router.push('/auth');
+    // يمكنك تعديل هذا السطر ليوجه المستخدم لأي صفحة تريدها بعد الخروج
+    router.push('/auth'); 
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

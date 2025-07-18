@@ -2,154 +2,169 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useMutation, gql } from '@apollo/client';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { FaEnvelope, FaLock, FaUser, FaBookReader } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaUser, FaBookOpen } from 'react-icons/fa';
 import './AuthPage.css';
 
-// --- التعديل الأول هنا ---
-// تم تغيير نوع المتغير $email إلى citext!
-const REGISTER_MUTATION = gql`
-  mutation InsertUser($displayName: String!, $email: citext!, $password: String!, $locale: String!) {
-    insert_auth_users_one(object: {
-      display_name: $displayName, 
-      email: $email, 
-      password_hash: $password,
-      locale: $locale
-    }) {
-      id
-      email
-    }
-  }
-`;
+// --- تم تعديل المكون ليعرض أعمدة متعددة ---
+const AnimatedBookCovers = () => {
+  // قائمة بصور الأغلفة من مجلد public/assets
+  // تمت زيادة عدد الصور لتحسين مظهر الحركة
+  const allBookCovers = [
+    '/assets/book-cover-1.jpg', '/assets/book2.jpg', '/assets/book-cover-3.jpg', '/assets/book4.jpg',
+    '/assets/book-cover-2.jpg', '/assets/book1.jpg', '/assets/book5.jpg', '/assets/book3.jpg',
+    '/assets/darys-book-cover.jpg', '/assets/auth-image.jpg', '/assets/book-cover-1.jpg', '/assets/book-cover-2.jpg',
+    '/assets/book-cover-3.jpg', '/assets/book1.jpg', '/assets/book2.jpg', '/assets/book3.jpg',
+  ];
 
-// --- التعديل الثاني هنا ---
-// تم تغيير نوع المتغير $email إلى citext!
-const LOGIN_MUTATION = gql`
-  mutation Login($email: citext!, $password: String!) {
-    login(args: {email: $email, password: $password}) {
-      accessToken
-      user {
-        id
-        displayName
-        email
-        roles
-      }
-    }
-  }
-`;
+  // --- 1. تم تغيير عدد الأعمدة إلى أربعة ---
+  const numColumns = 4;
+  const columns = Array.from({ length: numColumns }, () => []);
+  allBookCovers.forEach((cover, index) => {
+    columns[index % numColumns].push(cover);
+  });
+
+  // تكرار الصور داخل كل عمود لضمان حركة سلسة
+  const loopedColumns = columns.map(col => [...col, ...col]);
+
+  return (
+    <div className="animated-covers-container">
+      {loopedColumns.map((column, colIndex) => (
+        <div 
+          key={colIndex} 
+          className="covers-track"
+          // --- 2. تعديل الحركة لتعمل بشكل متعاكس ---
+          // الأعمدة الزوجية (0, 2) تتحرك للأعلى (scrollVertical)
+          // الأعمدة الفردية (1, 3) تتحرك للأسفل (scrollVerticalReverse)
+          style={{ 
+            animationName: colIndex % 2 === 1 ? 'scrollVerticalReverse' : 'scrollVertical',
+            animationDuration: `${60 + colIndex * 5}s` // تغيير السرعات بشكل طفيف لكل عمود
+          }}
+        >
+          {column.map((cover, imgIndex) => (
+            <img 
+              key={`${cover}-${imgIndex}`} 
+              src={cover} 
+              alt={`Book Cover`} 
+              className="book-cover-item" 
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+};
+
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { login, user, isLoading: authIsLoading } = useAuth();
   const router = useRouter();
   
-  const [registerUser, { loading: registerLoading }] = useMutation(REGISTER_MUTATION);
-  const [loginUser, { loading: loginLoading }] = useMutation(LOGIN_MUTATION);
-  const isLoading = registerLoading || loginLoading;
-
-  useEffect(() => {
-    if (!authIsLoading && user) {
-      router.push('/');
-    }
-  }, [user, authIsLoading, router]);
-
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    setError('');
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
+    setIsLoading(true);
     try {
       if (isLogin) {
-        const { data } = await loginUser({ 
-          variables: { 
-            email: formData.email, 
-            password: formData.password 
-          } 
+        const response = await fetch('/api/auth/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.email, password: formData.password })
         });
-
-        if (!data || !data.login || !data.login.accessToken) {
-          throw new Error("البريد الإلكتروني أو كلمة المرور غير صحيحة.");
-        }
-        login(data.login);
-
+        const data = await response.json();
+        if (!response.ok) { throw new Error(data.message || "فشل تسجيل الدخول."); }
+        login(data);
+        router.push('/');
       } else {
-        await registerUser({ 
-          variables: { 
-            displayName: formData.name, 
-            email: formData.email, 
-            password: formData.password,
-            locale: 'ar'
-          } 
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            displayName: formData.name,
+            email: formData.email,
+            password: formData.password
+          })
         });
+        const result = await response.json();
+        if (!response.ok) { throw new Error(result.message); }
         alert('تم إنشاء حسابك بنجاح. يمكنك الآن تسجيل الدخول.');
         setIsLogin(true);
       }
     } catch (err) {
-      if (err.message.includes('Uniqueness violation')) {
-        setError("هذا البريد الإلكتروني مسجل بالفعل.");
-      } else if (err.message.includes("Function 'login' not found")) {
-        setError("خطأ في الخادم: دالة تسجيل الدخول غير موجودة. يرجى مراجعة مطور الواجهة الخلفية.");
-      } else {
-        setError("البريد الإلكتروني أو كلمة المرور غير صحيحة.");
-      }
-      console.error(err);
+      setError(err.message || "حدث خطأ غير متوقع.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   if (authIsLoading || user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <p className="text-xl">جاري التحميل...</p>
       </div>
     );
   }
 
   return (
-    <div className="auth-page-container">
-      <div className="auth-card">
-        <header className="auth-header">
-          <FaBookReader className="auth-icon" />
-          <h1>{isLogin ? 'أهلاً بعودتك' : 'انضم إلى مكتبتنا'}</h1>
-          <p>{isLogin ? 'سجل دخولك لتكمل رحلتك' : 'أنشئ حسابك وابدأ القراءة'}</p>
-        </header>
-
-        <form className="auth-form" onSubmit={handleSubmit}>
-          {!isLogin && (
-            <div className="input-group">
-              <FaUser /><input type="text" name="name" placeholder="الاسم الكامل" value={formData.name} onChange={handleChange} required />
-            </div>
-          )}
-          <div className="input-group">
-            <FaEnvelope /><input type="email" name="email" placeholder="البريد الإلكتروني" value={formData.email} onChange={handleChange} required />
-          </div>
-          <div className="input-group">
-            <FaLock /><input type="password" name="password" placeholder="كلمة المرور" value={formData.password} onChange={handleChange} required />
-          </div>
-          
-          {error && <p className="error-message">{error}</p>}
-          
-          <button type="submit" className="auth-button" disabled={isLoading}>
-            {isLoading ? 'جاري...' : (isLogin ? 'تسجيل الدخول' : 'إنشاء حساب')}
-          </button>
-        </form>
-
-        <footer className="auth-footer">
-          <p>
-            {isLogin ? 'ليس لديك حساب؟' : 'لديك حساب بالفعل؟'}
-            <button type="button" onClick={() => { setIsLogin(!isLogin); setError(''); }} className="switch-button">
-              {isLogin ? 'إنشاء حساب' : 'تسجيل الدخول'}
-            </button>
+    <div className="auth-container">
+      {/* -- القسم الأيمن: رسالة الترحيب والخلفية المتحركة -- */}
+      <div className="welcome-panel">
+        <AnimatedBookCovers />
+        <div className="welcome-content">
+          <FaBookOpen className="welcome-icon" />
+          <h1 className="welcome-title">مرحباً بك في iLibrary</h1>
+          <p className="welcome-text">
+            بوابتك إلى عالم من المعرفة والمتعة. سجل دخولك أو أنشئ حساباً جديداً لتبدأ رحلتك.
           </p>
-        </footer>
+        </div>
+      </div>
+
+      {/* -- القسم الأيسر: فورم الدخول -- */}
+      <div className="form-panel">
+        <div className="auth-card">
+          <header className="auth-header">
+            <h1>{isLogin ? 'أهلاً بعودتك' : 'انضم إلى مكتبتنا'}</h1>
+            <p>{isLogin ? 'سجل دخولك لتكمل رحلتك' : 'أنشئ حسابك وابدأ القراءة'}</p>
+          </header>
+
+          <form className="auth-form" onSubmit={handleSubmit}>
+            {!isLogin && (
+              <div className="input-group">
+                <FaUser /><input type="text" name="name" placeholder="الاسم الكامل" value={formData.name} onChange={handleChange} required />
+              </div>
+            )}
+            <div className="input-group">
+              <FaEnvelope /><input type="email" name="email" placeholder="البريد الإلكتروني" value={formData.email} onChange={handleChange} required />
+            </div>
+            <div className="input-group">
+              <FaLock /><input type="password" name="password" placeholder="كلمة المرور" value={formData.password} onChange={handleChange} required />
+            </div>
+            
+            {error && <p className="error-message">{error}</p>}
+            
+            <button type="submit" className="auth-button" disabled={isLoading}>
+              {isLoading ? 'جاري...' : (isLogin ? 'تسجيل الدخول' : 'إنشاء حساب')}
+            </button>
+          </form>
+
+          <footer className="auth-footer">
+            <p>
+              {isLogin ? 'ليس لديك حساب؟' : 'لديك حساب بالفعل؟'}
+              <button type="button" onClick={() => { setIsLogin(!isLogin); setError(''); }} className="switch-button">
+                {isLogin ? 'إنشاء حساب' : 'تسجيل الدخول'}
+              </button>
+            </p>
+          </footer>
+        </div>
       </div>
     </div>
   );
