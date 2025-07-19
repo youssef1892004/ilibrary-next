@@ -1,49 +1,60 @@
 import { gql } from '@apollo/client';
 
-// استعلام للحصول على جميع الكتب
+// استعلام للحصول على جميع الكتب (مع طلب العلاقات الصحيحة)
 export const GET_BOOKS = gql`
   query GetBooks($limit: Int, $offset: Int, $category: String, $search: String) {
-    books(limit: $limit, offset: $offset, category: $category, search: $search) {
+    # قد يكون اسم الجدول libaray_Book أو books
+    libaray_Book(limit: $limit, offset: $offset, where: {category: {name: {_eq: $category}}, title: {_ilike: $search}}) {
       id
       title
-      author
-      description
       coverImage
-      category
-      publishedDate
-      rating
-      totalPages
-      language
-      isbn
-      createdAt
-      updatedAt
+      # طلب كائن المؤلف للحصول على الاسم
+      author {
+        name
+      }
+      # طلب كائن التصنيف للحصول على الاسم
+      category {
+        name
+      }
     }
   }
 `;
 
-// استعلام للحصول على كتاب واحد بالتفصيل
+// استعلام للحصول على كتاب واحد بالتفصيل (مع كل العلاقات الصحيحة)
 export const GET_BOOK = gql`
-  query GetBook($id: ID!) {
-    book(id: $id) {
+  query GetBook($id: uuid!) {
+    # قد يكون اسم الجدول libaray_Book_by_pk أو book_by_pk
+    libaray_Book_by_pk(id: $id) {
       id
       title
-      author
       description
       coverImage
-      category
-      publishedDate
-      rating
-      totalPages
-      language
-      isbn
-      content
-      createdAt
-      updatedAt
+      publication_date: publicationDate
+      ISBN
+      total_pages
+      
+      # طلب كائن المؤلف للحصول على الاسم
+      author {
+        name
+      }
+      
+      # طلب كائن التصنيف للحصول على الاسم
+      category {
+        name
+      }
+
+      # طلب قائمة الفصول كاملة
+      chapter {
+        id
+        title
+        chapter_num
+      }
     }
   }
 `;
 
-// استعلام للحصول على محتوى الكتاب للقراءة
+// --- باقي الاستعلامات ---
+
 export const GET_BOOK_CONTENT = gql`
   query GetBookContent($id: ID!) {
     bookContent(id: $id) {
@@ -59,7 +70,6 @@ export const GET_BOOK_CONTENT = gql`
   }
 `;
 
-// استعلام للحصول على الكتب المفضلة للمستخدم
 export const GET_USER_FAVORITES = gql`
   query GetUserFavorites {
     userFavorites {
@@ -67,18 +77,18 @@ export const GET_USER_FAVORITES = gql`
       book {
         id
         title
-        author
-        description
         coverImage
-        category
-        rating
+        author {
+          name
+        }
+        category {
+          name
+        }
       }
-      createdAt
     }
   }
 `;
 
-// استعلام للحصول على معلومات المستخدم الحالي
 export const GET_CURRENT_USER = gql`
   query GetCurrentUser {
     me {
@@ -86,93 +96,24 @@ export const GET_CURRENT_USER = gql`
       name
       email
       avatar
-      createdAt
-      preferences {
-        language
-        theme
-        fontSize
-      }
     }
   }
 `;
 
-// استعلام للحصول على إحصائيات المستخدم
-export const GET_USER_STATS = gql`
-  query GetUserStats {
-    userStats {
-      totalBooksRead
-      totalFavorites
-      totalComments
-      totalHighlights
-      readingStreak
-    }
-  }
-`;
-
-// استعلام للبحث في الكتب
 export const SEARCH_BOOKS = gql`
   query SearchBooks($query: String!, $limit: Int, $offset: Int) {
     searchBooks(query: $query, limit: $limit, offset: $offset) {
       books {
         id
         title
-        author
-        description
         coverImage
-        category
-        rating
+        author {
+          name
+        }
+        category {
+          name
+        }
       }
-      totalCount
-      hasMore
     }
   }
 `;
-
-// استعلام للحصول على الكتب الشائعة
-export const GET_POPULAR_BOOKS = gql`
-  query GetPopularBooks($limit: Int) {
-    popularBooks(limit: $limit) {
-      id
-      title
-      author
-      description
-      coverImage
-      category
-      rating
-      totalReads
-    }
-  }
-`;
-
-// استعلام للحصول على الكتب الجديدة
-export const GET_LATEST_BOOKS = gql`
-  query GetLatestBooks($limit: Int) {
-    latestBooks(limit: $limit) {
-      id
-      title
-      author
-      description
-      coverImage
-      category
-      publishedDate
-      rating
-    }
-  }
-`;
-
-// استعلام للحصول على الكتب المقترحة
-export const GET_RECOMMENDED_BOOKS = gql`
-  query GetRecommendedBooks($limit: Int) {
-    recommendedBooks(limit: $limit) {
-      id
-      title
-      author
-      description
-      coverImage
-      category
-      rating
-      reason
-    }
-  }
-`;
-

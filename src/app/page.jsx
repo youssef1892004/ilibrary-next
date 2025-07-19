@@ -5,13 +5,19 @@ import LatestBooks from '@/components/LatestBooks';
 import LatestWriters from '@/components/LatestWriters';
 import Testimonials from '@/components/Testimonials';
 import ComingSoon from '@/components/ComingSoon';
+import ContinueReading from '@/components/ContinueReading'; // 1. استيراد المكون الجديد
 
 export default function HomePage() {
   return (
-    // -- التعديل هنا: أضفنا لون خلفية داكن للصفحة الرئيسية --
     <main className="bg-white dark:bg-gray-900">
       <Hero />
-      {/* سنضيف المسافات يدويًا بدلاً من space-y */}
+      
+      {/* --- بداية التعديل: إضافة قسم "أكمل القراءة" --- */}
+      <div className="py-12">
+        <ContinueReading />
+      </div>
+      {/* --- نهاية التعديل --- */}
+
       <div className="py-12">
         <LatestBooks />
       </div>

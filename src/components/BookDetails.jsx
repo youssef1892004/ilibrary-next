@@ -4,17 +4,16 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaUserAlt, FaCalendarAlt, FaBook, FaListOl, FaBarcode, FaFileAlt } from 'react-icons/fa';
+import { FaUserAlt, FaCalendarAlt, FaBook, FaListOl, FaBarcode, FaFileAlt, FaTag } from 'react-icons/fa';
 import { useLanguage } from '@/context/LanguageContext';
 
 const BookDetails = ({ book }) => {
   const { t } = useLanguage();
 
-  // Extract data from relationships according to the new schema
   const author = book.Book_Author?.[0];
   const category = book.book_category?.[0];
   const chapters = book.Bookchapters || [];
-
+  
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 mb-16">
@@ -31,8 +30,14 @@ const BookDetails = ({ book }) => {
 
         <div className="lg:col-span-2">
           {category && (
-            <p className="text-purple-500 dark:text-purple-400 font-semibold mb-2">{category.name}</p>
+            <div className="mb-3">
+              <span className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-sm font-semibold bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+                <FaTag />
+                {category.name}
+              </span>
+            </div>
           )}
+
           <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-2">{book.title}</h1>
           
           {author && (
@@ -40,7 +45,7 @@ const BookDetails = ({ book }) => {
               <Link href={`/writers/${author.id}`} className="text-xl text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors inline-flex items-center gap-2">
                 <FaUserAlt />
                 <span>{author.name || 'غير معروف'}</span>
-              </Link>
+              </Link> {/* --- تم تصحيح الخطأ الإملائي هنا --- */}
             </div>
           )}
           

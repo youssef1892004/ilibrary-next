@@ -1,7 +1,7 @@
 // src/app/books/BooksPageClient.jsx
 "use client";
 
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import BookCard from '@/components/BookCard';
 import { useLanguage } from '@/context/LanguageContext';
@@ -9,19 +9,14 @@ import { FaSearch } from 'react-icons/fa';
 
 const BOOKS_PER_PAGE = 20;
 
-// استعلام GraphQL الصحيح بناءً على الـ schema الجديدة
+// --- بداية التعديل: تطبيق استعلامك الديناميكي ---
 const GET_BOOKS_WITH_RELATIONS = gql`
-  query GetBooksWithRelations($limit: Int!, $offset: Int!, $search: String!) {
+  query GetBooksWithRelations($limit: Int!, $offset: Int!, $where: libaray_Book_bool_exp!) {
     libaray_Book(
       limit: $limit,
       offset: $offset,
       order_by: { publicationDate: desc },
-      where: {
-        _or: [
-          { title: { _ilike: $search } },
-          { Book_Author: { name: { _ilike: $search } } }
-        ]
-      }
+      where: $where
     ) {
       id
       title
@@ -35,12 +30,26 @@ const GET_BOOKS_WITH_RELATIONS = gql`
     }
   }
 `;
+// --- نهاية التعديل ---
+
+const GET_CATEGORIES = gql`
+  query GetCategories {
+    libaray_Category(order_by: {name: asc}) {
+      id
+      name
+    }
+  }
+`;
 
 const BooksPageClient = () => {
   const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [hasMore, setHasMore] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const { data: categoriesData } = useQuery(GET_CATEGORIES);
+  const categories = categoriesData?.libaray_Category || [];
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -49,31 +58,36 @@ const BooksPageClient = () => {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
+  // --- بداية التعديل: بناء جملة 'where' بشكل ديناميكي ---
+  const whereClause = {
+    _or: [
+      { title: { _ilike: `%${debouncedSearchTerm}%` } },
+      { Book_Author: { name: { _ilike: `%${debouncedSearchTerm}%` } } }
+    ]
+  };
+
+  if (selectedCategory) {
+    whereClause.book_category = { name: { _eq: selectedCategory } };
+  }
+  // --- نهاية التعديل ---
+
   const { loading, error, data, fetchMore } = useQuery(GET_BOOKS_WITH_RELATIONS, {
     variables: {
       limit: BOOKS_PER_PAGE,
       offset: 0,
-      search: `%${debouncedSearchTerm}%`
-    },
-    onCompleted: (data) => {
-      if (data.libaray_Book.length < BOOKS_PER_PAGE) {
-        setHasMore(false);
-      } else {
-        setHasMore(true);
-      }
+      where: whereClause
     },
     notifyOnNetworkStatusChange: true,
   });
 
   useEffect(() => {
     setHasMore(true);
-  }, [debouncedSearchTerm]);
+  }, [debouncedSearchTerm, selectedCategory]);
 
   const books = data?.libaray_Book || [];
 
   const loadMore = useCallback(() => {
     if (loading || !hasMore) return;
-
     fetchMore({
       variables: {
         offset: books.length
@@ -96,22 +110,19 @@ const BooksPageClient = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.innerHeight + document.documentElement.scrollTop < document.documentElement.offsetHeight - 500 || loading || !hasMore) {
-        return;
-      }
+      if (window.innerHeight + document.documentElement.scrollTop < document.documentElement.offsetHeight - 500 || loading) return;
       loadMore();
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [loading, hasMore, loadMore]);
+  }, [loading, loadMore]);
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold text-center mb-6 text-gray-900 dark:text-white">
         {t.allBooks || "جميع الكتب"}
       </h1>
-      <div className="mb-12 max-w-2xl mx-auto">
+      <div className="mb-8 max-w-2xl mx-auto">
         <div className="relative">
           <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
             <FaSearch className="text-gray-400" />
@@ -126,8 +137,26 @@ const BooksPageClient = () => {
         </div>
       </div>
 
+      <div className="flex justify-center flex-wrap gap-2 mb-12">
+        <button
+          onClick={() => setSelectedCategory(null)}
+          className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${selectedCategory === null ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}`}
+        >
+          الكل
+        </button>
+        {categories.map((category) => (
+          <button
+            key={category.id}
+            onClick={() => setSelectedCategory(category.name)}
+            className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${selectedCategory === category.name ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}`}
+          >
+            {category.name}
+          </button>
+        ))}
+      </div>
+      
       {loading && books.length === 0 && <div className="text-center py-10"><p>جاري البحث...</p></div>}
-      {error && <div className="text-center py-10 text-red-500"><p>حدث خطأ أثناء جلب البيانات. يرجى مراجعة صلاحيات الوصول في Hasura.</p></div>}
+      {error && <div className="text-center py-10 text-red-500"><p>حدث خطأ أثناء جلب البيانات: {error.message}</p></div>}
       
       {!error && (
         <>
@@ -140,7 +169,7 @@ const BooksPageClient = () => {
           {books.length === 0 && !loading && (
             <div className="text-center py-20">
               <p className="text-lg text-gray-500 dark:text-gray-400">
-                لم يتم العثور على كتب تطابق بحثك.
+                لم يتم العثور على كتب تطابق بحثك أو التصنيف المختار.
               </p>
             </div>
           )}

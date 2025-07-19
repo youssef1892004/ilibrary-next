@@ -7,15 +7,17 @@ import { useMutation, gql } from '@apollo/client';
 import { FaStar, FaTimes } from 'react-icons/fa';
 import { useAuth } from '@/context/AuthContext';
 
+// --- بداية التعديل: تغيير نوع user_id إلى uuid! ---
 const INSERT_REVIEW_MUTATION = gql`
-  mutation InsertReview($rating: Int, $q1_answer: String, $q2_answer: String, $q3_answer: String) {
-    insert_ilibarary_Review(objects: {rating: $rating, q1_answer: $q1_answer, q2_answer: $q2_answer, q3_answer: $q3_answer}) {
+  mutation InsertReview($rating: Int, $q1_answer: String, $q2_answer: String, $q3_answer: String, $user_id: uuid!) {
+    insert_libaray_Review(objects: {rating: $rating, q1_answer: $q1_answer, q2_answer: $q2_answer, q3_answer: $q3_answer, user_id: $user_id}) {
       affected_rows
     }
   }
 `;
+// --- نهاية التعديل ---
 
-const ReviewModal = ({ isOpen, onClose }) => {
+const ReviewModal = ({ isOpen, onClose, onSubmitted }) => {
   const { user } = useAuth();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -23,7 +25,7 @@ const ReviewModal = ({ isOpen, onClose }) => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false); // حالة جديدة لعرض طلب الدخول
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const [insertReview] = useMutation(INSERT_REVIEW_MUTATION);
 
@@ -36,7 +38,6 @@ const ReviewModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     setError('');
 
-    // 1. إذا كان المستخدم زائراً، اظهر له رسالة لتسجيل الدخول
     if (!user) {
       setShowLoginPrompt(true);
       return;
@@ -55,9 +56,11 @@ const ReviewModal = ({ isOpen, onClose }) => {
           q1_answer: answers.q1,
           q2_answer: answers.q2,
           q3_answer: answers.q3,
+          user_id: user.id 
         }
       });
       setIsSubmitted(true);
+      if (onSubmitted) onSubmitted();
       setTimeout(() => onClose(), 3000);
     } catch (err) {
       console.error("Failed to submit review:", err);
@@ -83,9 +86,9 @@ const ReviewModal = ({ isOpen, onClose }) => {
           </div>
         ) : (
           <>
-            <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">ما رأيك في تجربت في موقعنا؟</h2>
+            <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">ما رأيك في تجربتك في موقعنا؟</h2>
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* حقول التقييم والأسئلة ... لا تغيير هنا */}
+              {/* حقول التقييم والأسئلة تبقى كما هي */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ما هو تقييمك العام؟</label>
                 <div className="flex justify-center" dir="ltr">
@@ -105,7 +108,6 @@ const ReviewModal = ({ isOpen, onClose }) => {
                 <textarea id="q3" name="q3" rows="2" value={answers.q3} onChange={handleAnswerChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600"></textarea>
               </div>
 
-              {/* 2. عرض رسالة الخطأ أو رسالة طلب الدخول */}
               {showLoginPrompt ? (
                 <div className="text-center p-4 border border-yellow-300 bg-yellow-50 dark:bg-gray-700 rounded-lg">
                   <p className="font-semibold text-yellow-800 dark:text-yellow-300">يجب تسجيل الدخول أولاً</p>
@@ -118,7 +120,6 @@ const ReviewModal = ({ isOpen, onClose }) => {
                 <p className="text-red-500 text-sm text-center">{error}</p>
               ) : null}
 
-              {/* 3. إخفاء زر الإرسال إذا ظهر طلب تسجيل الدخول */}
               {!showLoginPrompt && (
                 <button type="submit" disabled={isSubmitting} className="w-full bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors disabled:bg-purple-400">
                   {isSubmitting ? 'جاري الإرسال...' : 'إرسال التقييم'}

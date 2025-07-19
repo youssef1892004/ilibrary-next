@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { FaUserAlt, FaCalendarAlt, FaBook, FaListOl, FaBarcode, FaFileAlt, FaChevronDown } from 'react-icons/fa';
+import { FaUserAlt, FaCalendarAlt, FaBook, FaListOl, FaBarcode, FaFileAlt, FaChevronDown, FaTag } from 'react-icons/fa'; // FaTag تمت إضافته
 import { useLanguage } from '@/context/LanguageContext';
 
 const BookDetails = ({ book }) => {
@@ -47,6 +47,17 @@ const BookDetails = ({ book }) => {
 
         <div className="lg:col-span-2">
           <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">{book.title}</h1>
+          
+          {/* ---- بداية الكود المضاف لعرض التصنيف ---- */}
+          {book.category && (
+            <div className="mb-6">
+              <span className="bg-purple-100 text-purple-800 text-sm font-medium me-2 px-3 py-1 rounded-full dark:bg-purple-900 dark:text-purple-300 inline-flex items-center gap-1">
+                <FaTag /> {book.category}
+              </span>
+            </div>
+          )}
+          {/* ---- نهاية الكود المضاف ---- */}
+
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">{book.description}</p>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 text-center">

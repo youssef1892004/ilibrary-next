@@ -1,47 +1,66 @@
 // src/components/GlobalReview.jsx
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import ReviewModal from './ReviewModal';
 
-// 1. إعادة المؤقت إلى 5 دقائق
-const FIVE_MINUTES = 5 * 60 * 1000; 
-const LOCAL_STORAGE_KEY = 'reviewModalHasBeenShown'; // اسم المفتاح في الـ localStorage
+const INACTIVITY_TIME = 5 * 60 * 1000; // 5 دقائق
+const SESSION_STORAGE_KEY = 'reviewHasBeenSubmitted';
 
 const GlobalReview = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    useEffect(() => {
-        // 2. التحقق أولاً إذا كانت النافذة قد ظهرت من قبل
-        const hasBeenShown = localStorage.getItem(LOCAL_STORAGE_KEY);
-
-        // إذا كانت قد ظهرت، لا تقم بتشغيل المؤقت مرة أخرى
-        if (hasBeenShown) {
-            return;
+    const resetTimer = useCallback(() => {
+        // إذا كان المستخدم قد أرسل تقييمًا بالفعل في هذه الجلسة، لا تقم بتشغيل المؤقت
+        if (sessionStorage.getItem(SESSION_STORAGE_KEY)) {
+            return null;
         }
 
-        // إذا لم تكن قد ظهرت، قم بتشغيل المؤقت
         const timer = setTimeout(() => {
-            // 3. عند انتهاء المؤقت، قم بتسجيل أنها ظهرت في الـ localStorage
-            try {
-                localStorage.setItem(LOCAL_STORAGE_KEY, 'true');
-            } catch (error) {
-                console.error("Could not save to localStorage", error);
-            }
-            
-            // ثم قم بإظهار النافذة
             setIsModalOpen(true);
-        }, FIVE_MINUTES);
+        }, INACTIVITY_TIME);
 
-        // تنظيف المؤقت عند مغادرة الصفحة
-        return () => clearTimeout(timer);
-        
-    }, []); // مصفوفة فارغة تعني أن هذا الكود سيعمل مرة واحدة فقط عند بداية الجلسة
+        return timer;
+    }, []);
+
+    useEffect(() => {
+        let inactivityTimer = resetTimer();
+
+        const events = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
+
+        const eventHandler = () => {
+            if (inactivityTimer) {
+                clearTimeout(inactivityTimer);
+            }
+            inactivityTimer = resetTimer();
+        };
+
+        // إضافة مستمعي الأحداث لإعادة تشغيل المؤقت عند تفاعل المستخدم
+        events.forEach(event => window.addEventListener(event, eventHandler));
+
+        // تنظيف المؤقت ومستمعي الأحداث عند مغادرة الصفحة
+        return () => {
+            if (inactivityTimer) {
+                clearTimeout(inactivityTimer);
+            }
+            events.forEach(event => window.removeEventListener(event, eventHandler));
+        };
+    }, [resetTimer]);
+
+    const handleSubmitted = () => {
+        // عند إرسال التقييم بنجاح، قم بتسجيل ذلك في الـ sessionStorage
+        try {
+            sessionStorage.setItem(SESSION_STORAGE_KEY, 'true');
+        } catch (error) {
+            console.error("Could not save to sessionStorage", error);
+        }
+    };
 
     return (
         <ReviewModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
+            onSubmitted={handleSubmitted}
         />
     );
 };

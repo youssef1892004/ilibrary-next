@@ -8,7 +8,6 @@ import { FaHeart, FaRegHeart, FaBookOpen, FaUserAlt, FaTag } from 'react-icons/f
 import { useFavorites } from '@/context/FavoritesContext';
 import { useLanguage } from '@/context/LanguageContext';
 
-// --- تم تعديل المكون ليقبل authorName كخاصية اختيارية ---
 const BookCard = ({ book, authorName: authorNameFromProp }) => {
   if (!book) {
     return null; 
@@ -18,7 +17,6 @@ const BookCard = ({ book, authorName: authorNameFromProp }) => {
   const { t } = useLanguage();
   const isFavorite = favorites.some((fav) => fav.id === book.id);
 
-  // إذا تم تمرير اسم المؤلف، استخدمه. وإلا، ابحث عنه داخل كائن الكتاب.
   const authorName = authorNameFromProp || book.Book_Author?.[0]?.name;
   const categoryName = book.book_category?.[0]?.name;
 
@@ -28,7 +26,14 @@ const BookCard = ({ book, authorName: authorNameFromProp }) => {
     if (isFavorite) {
       removeFavorite(book.id);
     } else {
-      addFavorite({ ...book, authorName, categoryName }); 
+      const bookToAdd = {
+        id: book.id,
+        title: book.title,
+        coverImage: book.coverImage,
+        Book_Author: [{ name: authorName }],
+        book_category: [{ name: categoryName }]
+      };
+      addFavorite(bookToAdd); 
     }
   };
 
@@ -44,6 +49,15 @@ const BookCard = ({ book, authorName: authorNameFromProp }) => {
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         </div>
+
+        {categoryName && (
+          <div className="absolute top-2 left-2">
+            <span className="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-semibold bg-purple-600/80 text-white backdrop-blur-sm">
+              <FaTag size={10} />
+              {categoryName}
+            </span>
+          </div>
+        )}
       </Link>
       
       <div className="p-4 flex flex-col flex-grow">
@@ -53,23 +67,17 @@ const BookCard = ({ book, authorName: authorNameFromProp }) => {
           </h3>
         </Link>
 
+        {/* --- بداية التعديل: تكبير الخط وجعله BOLD --- */}
         {authorName && (
-          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
-            <FaUserAlt size={12} />
-            <p className="text-sm font-medium truncate">{authorName}</p>
-          </div>
+          <p className="text-lg text-gray-700 dark:text-gray-300 font-bold mb-3 truncate">
+            {t.by || "بواسطة"}: {authorName}
+          </p>
         )}
+        {/* --- نهاية التعديل --- */}
         
-        {categoryName && (
-            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-xs mb-3">
-                <FaTag size={12}/>
-                <span>{categoryName}</span>
-            </div>
-        )}
-
         <div className="flex-grow"></div> 
 
-        <div className="mt-4 flex items-center gap-2">
+        <div className="mt-auto pt-4 flex items-center gap-2">
           <Link 
             href={`/books/${book.id}`} 
             className="flex-grow flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"

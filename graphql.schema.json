@@ -13713,6 +13713,192 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "Category_Id",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "uuid",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "auther_category",
+                            "description": "An array relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "libaray_Category_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "libaray_Category_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "libaray_Category_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "LIST",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "OBJECT",
+                                            "name": "libaray_Category",
+                                            "ofType": null
+                                        }
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "auther_category_aggregate",
+                            "description": "An aggregate relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "libaray_Category_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "libaray_Category_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "libaray_Category_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "libaray_Category_aggregate",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "bio",
                             "description": null,
                             "args": [],
@@ -14336,6 +14522,16 @@
                             "defaultValue": null
                         },
                         {
+                            "name": "Category_Id",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "uuid_comparison_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
                             "name": "_and",
                             "description": null,
                             "type": {
@@ -14378,6 +14574,26 @@
                                         "ofType": null
                                     }
                                 }
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "auther_category",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Category_bool_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "auther_category_aggregate",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Category_aggregate_bool_exp",
+                                "ofType": null
                             },
                             "defaultValue": null
                         },
@@ -14491,6 +14707,26 @@
                             "defaultValue": null
                         },
                         {
+                            "name": "Category_Id",
+                            "description": null,
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "uuid",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "auther_category",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Category_arr_rel_insert_input",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
                             "name": "bio",
                             "description": null,
                             "type": {
@@ -14550,6 +14786,18 @@
                     "name": "libaray_Autor_max_fields",
                     "description": "aggregate max on columns",
                     "fields": [
+                        {
+                            "name": "Category_Id",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "uuid",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
                         {
                             "name": "bio",
                             "description": null,
@@ -14623,6 +14871,16 @@
                     "fields": null,
                     "inputFields": [
                         {
+                            "name": "Category_Id",
+                            "description": null,
+                            "type": {
+                                "kind": "ENUM",
+                                "name": "order_by",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
                             "name": "bio",
                             "description": null,
                             "type": {
@@ -14682,6 +14940,18 @@
                     "name": "libaray_Autor_min_fields",
                     "description": "aggregate min on columns",
                     "fields": [
+                        {
+                            "name": "Category_Id",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "uuid",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
                         {
                             "name": "bio",
                             "description": null,
@@ -14754,6 +15024,16 @@
                     "description": "order by min() on columns of table \"libaray.Autor\"",
                     "fields": null,
                     "inputFields": [
+                        {
+                            "name": "Category_Id",
+                            "description": null,
+                            "type": {
+                                "kind": "ENUM",
+                                "name": "order_by",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
                         {
                             "name": "bio",
                             "description": null,
@@ -14934,6 +15214,26 @@
                             "defaultValue": null
                         },
                         {
+                            "name": "Category_Id",
+                            "description": null,
+                            "type": {
+                                "kind": "ENUM",
+                                "name": "order_by",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "auther_category_aggregate",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Category_aggregate_order_by",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
                             "name": "bio",
                             "description": null,
                             "type": {
@@ -15022,6 +15322,12 @@
                     "interfaces": null,
                     "enumValues": [
                         {
+                            "name": "Category_Id",
+                            "description": "column name",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "bio",
                             "description": "column name",
                             "isDeprecated": false,
@@ -15060,6 +15366,16 @@
                     "description": "input type for updating data in table \"libaray.Autor\"",
                     "fields": null,
                     "inputFields": [
+                        {
+                            "name": "Category_Id",
+                            "description": null,
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "uuid",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
                         {
                             "name": "bio",
                             "description": null,
@@ -15289,6 +15605,16 @@
                     "fields": null,
                     "inputFields": [
                         {
+                            "name": "Category_Id",
+                            "description": null,
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "uuid",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
                             "name": "bio",
                             "description": null,
                             "type": {
@@ -15395,6 +15721,12 @@
                     "inputFields": null,
                     "interfaces": null,
                     "enumValues": [
+                        {
+                            "name": "Category_Id",
+                            "description": "column name",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
                         {
                             "name": "bio",
                             "description": "column name",
@@ -20702,6 +21034,180 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "category_Autor",
+                            "description": "An array relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "libaray_Autor_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "libaray_Autor_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "libaray_Autor_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "LIST",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "OBJECT",
+                                            "name": "libaray_Autor",
+                                            "ofType": null
+                                        }
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "category_Autor_aggregate",
+                            "description": "An aggregate relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "libaray_Autor_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "libaray_Autor_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "libaray_Autor_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "libaray_Autor_aggregate",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "chapter_book",
                             "description": "An array relationship",
                             "args": [
@@ -21561,6 +22067,26 @@
                             "defaultValue": null
                         },
                         {
+                            "name": "category_Autor",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Autor_bool_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "category_Autor_aggregate",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Autor_aggregate_bool_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
                             "name": "chapter_book",
                             "description": null,
                             "type": {
@@ -21756,6 +22282,16 @@
                             "type": {
                                 "kind": "SCALAR",
                                 "name": "uuid",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "category_Autor",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Autor_arr_rel_insert_input",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -22209,6 +22745,16 @@
                             "type": {
                                 "kind": "ENUM",
                                 "name": "order_by",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "category_Autor_aggregate",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Autor_aggregate_order_by",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -23230,7 +23776,7 @@
                                             "name": null,
                                             "ofType": {
                                                 "kind": "ENUM",
-                                                "name": "libaray_users_select_column",
+                                                "name": "users_select_column",
                                                 "ofType": null
                                             }
                                         }
@@ -23268,7 +23814,7 @@
                                             "name": null,
                                             "ofType": {
                                                 "kind": "INPUT_OBJECT",
-                                                "name": "libaray_users_order_by",
+                                                "name": "users_order_by",
                                                 "ofType": null
                                             }
                                         }
@@ -23280,7 +23826,7 @@
                                     "description": "filter the rows returned",
                                     "type": {
                                         "kind": "INPUT_OBJECT",
-                                        "name": "libaray_users_bool_exp",
+                                        "name": "users_bool_exp",
                                         "ofType": null
                                     },
                                     "defaultValue": null
@@ -23297,7 +23843,7 @@
                                         "name": null,
                                         "ofType": {
                                             "kind": "OBJECT",
-                                            "name": "libaray_users",
+                                            "name": "users",
                                             "ofType": null
                                         }
                                     }
@@ -23321,7 +23867,7 @@
                                             "name": null,
                                             "ofType": {
                                                 "kind": "ENUM",
-                                                "name": "libaray_users_select_column",
+                                                "name": "users_select_column",
                                                 "ofType": null
                                             }
                                         }
@@ -23359,7 +23905,7 @@
                                             "name": null,
                                             "ofType": {
                                                 "kind": "INPUT_OBJECT",
-                                                "name": "libaray_users_order_by",
+                                                "name": "users_order_by",
                                                 "ofType": null
                                             }
                                         }
@@ -23371,7 +23917,7 @@
                                     "description": "filter the rows returned",
                                     "type": {
                                         "kind": "INPUT_OBJECT",
-                                        "name": "libaray_users_bool_exp",
+                                        "name": "users_bool_exp",
                                         "ofType": null
                                     },
                                     "defaultValue": null
@@ -23382,7 +23928,7 @@
                                 "name": null,
                                 "ofType": {
                                     "kind": "OBJECT",
-                                    "name": "libaray_users_aggregate",
+                                    "name": "users_aggregate",
                                     "ofType": null
                                 }
                             },
@@ -23813,7 +24359,7 @@
                             "description": null,
                             "type": {
                                 "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_bool_exp",
+                                "name": "users_bool_exp",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -23823,7 +24369,7 @@
                             "description": null,
                             "type": {
                                 "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_aggregate_bool_exp",
+                                "name": "users_aggregate_bool_exp",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -23911,7 +24457,7 @@
                             "description": null,
                             "type": {
                                 "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_arr_rel_insert_input",
+                                "name": "users_arr_rel_insert_input",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -24310,7 +24856,7 @@
                             "description": null,
                             "type": {
                                 "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_aggregate_order_by",
+                                "name": "users_aggregate_order_by",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -24858,12 +25404,174 @@
                         },
                         {
                             "name": "readinghis_user",
-                            "description": "An object relationship",
-                            "args": [],
+                            "description": "An array relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "users_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "users_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "users_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
                             "type": {
-                                "kind": "OBJECT",
-                                "name": "libaray_users",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "LIST",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "OBJECT",
+                                            "name": "users",
+                                            "ofType": null
+                                        }
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "readinghis_user_aggregate",
+                            "description": "An aggregate relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "users_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "users_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "users_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "users_aggregate",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -25450,7 +26158,17 @@
                             "description": null,
                             "type": {
                                 "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_bool_exp",
+                                "name": "users_bool_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "readinghis_user_aggregate",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "users_aggregate_bool_exp",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -25558,7 +26276,7 @@
                             "description": null,
                             "type": {
                                 "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_obj_rel_insert_input",
+                                "name": "users_arr_rel_insert_input",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -26017,11 +26735,11 @@
                             "defaultValue": null
                         },
                         {
-                            "name": "readinghis_user",
+                            "name": "readinghis_user_aggregate",
                             "description": null,
                             "type": {
                                 "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_order_by",
+                                "name": "users_aggregate_order_by",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -26426,7 +27144,7 @@
                                             "name": null,
                                             "ofType": {
                                                 "kind": "ENUM",
-                                                "name": "libaray_users_select_column",
+                                                "name": "users_select_column",
                                                 "ofType": null
                                             }
                                         }
@@ -26464,7 +27182,7 @@
                                             "name": null,
                                             "ofType": {
                                                 "kind": "INPUT_OBJECT",
-                                                "name": "libaray_users_order_by",
+                                                "name": "users_order_by",
                                                 "ofType": null
                                             }
                                         }
@@ -26476,7 +27194,7 @@
                                     "description": "filter the rows returned",
                                     "type": {
                                         "kind": "INPUT_OBJECT",
-                                        "name": "libaray_users_bool_exp",
+                                        "name": "users_bool_exp",
                                         "ofType": null
                                     },
                                     "defaultValue": null
@@ -26493,7 +27211,7 @@
                                         "name": null,
                                         "ofType": {
                                             "kind": "OBJECT",
-                                            "name": "libaray_users",
+                                            "name": "users",
                                             "ofType": null
                                         }
                                     }
@@ -26517,7 +27235,7 @@
                                             "name": null,
                                             "ofType": {
                                                 "kind": "ENUM",
-                                                "name": "libaray_users_select_column",
+                                                "name": "users_select_column",
                                                 "ofType": null
                                             }
                                         }
@@ -26555,7 +27273,7 @@
                                             "name": null,
                                             "ofType": {
                                                 "kind": "INPUT_OBJECT",
-                                                "name": "libaray_users_order_by",
+                                                "name": "users_order_by",
                                                 "ofType": null
                                             }
                                         }
@@ -26567,7 +27285,7 @@
                                     "description": "filter the rows returned",
                                     "type": {
                                         "kind": "INPUT_OBJECT",
-                                        "name": "libaray_users_bool_exp",
+                                        "name": "users_bool_exp",
                                         "ofType": null
                                     },
                                     "defaultValue": null
@@ -26578,7 +27296,7 @@
                                 "name": null,
                                 "ofType": {
                                     "kind": "OBJECT",
-                                    "name": "libaray_users_aggregate",
+                                    "name": "users_aggregate",
                                     "ofType": null
                                 }
                             },
@@ -27213,7 +27931,7 @@
                             "description": null,
                             "type": {
                                 "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_bool_exp",
+                                "name": "users_bool_exp",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -27223,7 +27941,7 @@
                             "description": null,
                             "type": {
                                 "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_aggregate_bool_exp",
+                                "name": "users_aggregate_bool_exp",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -27388,7 +28106,7 @@
                             "description": null,
                             "type": {
                                 "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_arr_rel_insert_input",
+                                "name": "users_arr_rel_insert_input",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -27885,7 +28603,7 @@
                             "description": null,
                             "type": {
                                 "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_aggregate_order_by",
+                                "name": "users_aggregate_order_by",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -29329,90 +30047,6 @@
                     "possibleTypes": null
                 },
                 {
-                    "kind": "INPUT_OBJECT",
-                    "name": "libaray_users_aggregate_bool_exp",
-                    "description": null,
-                    "fields": null,
-                    "inputFields": [
-                        {
-                            "name": "count",
-                            "description": null,
-                            "type": {
-                                "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_aggregate_bool_exp_count",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        }
-                    ],
-                    "interfaces": null,
-                    "enumValues": null,
-                    "possibleTypes": null
-                },
-                {
-                    "kind": "INPUT_OBJECT",
-                    "name": "libaray_users_aggregate_bool_exp_count",
-                    "description": null,
-                    "fields": null,
-                    "inputFields": [
-                        {
-                            "name": "arguments",
-                            "description": null,
-                            "type": {
-                                "kind": "LIST",
-                                "name": null,
-                                "ofType": {
-                                    "kind": "NON_NULL",
-                                    "name": null,
-                                    "ofType": {
-                                        "kind": "ENUM",
-                                        "name": "libaray_users_select_column",
-                                        "ofType": null
-                                    }
-                                }
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "distinct",
-                            "description": null,
-                            "type": {
-                                "kind": "SCALAR",
-                                "name": "Boolean",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "filter",
-                            "description": null,
-                            "type": {
-                                "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_bool_exp",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "predicate",
-                            "description": null,
-                            "type": {
-                                "kind": "NON_NULL",
-                                "name": null,
-                                "ofType": {
-                                    "kind": "INPUT_OBJECT",
-                                    "name": "Int_comparison_exp",
-                                    "ofType": null
-                                }
-                            },
-                            "defaultValue": null
-                        }
-                    ],
-                    "interfaces": null,
-                    "enumValues": null,
-                    "possibleTypes": null
-                },
-                {
                     "kind": "OBJECT",
                     "name": "libaray_users_aggregate_fields",
                     "description": "aggregate fields of \"libaray.users\"",
@@ -29489,90 +30123,6 @@
                     ],
                     "inputFields": null,
                     "interfaces": [],
-                    "enumValues": null,
-                    "possibleTypes": null
-                },
-                {
-                    "kind": "INPUT_OBJECT",
-                    "name": "libaray_users_aggregate_order_by",
-                    "description": "order by aggregate values of table \"libaray.users\"",
-                    "fields": null,
-                    "inputFields": [
-                        {
-                            "name": "count",
-                            "description": null,
-                            "type": {
-                                "kind": "ENUM",
-                                "name": "order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "max",
-                            "description": null,
-                            "type": {
-                                "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_max_order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "min",
-                            "description": null,
-                            "type": {
-                                "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_min_order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        }
-                    ],
-                    "interfaces": null,
-                    "enumValues": null,
-                    "possibleTypes": null
-                },
-                {
-                    "kind": "INPUT_OBJECT",
-                    "name": "libaray_users_arr_rel_insert_input",
-                    "description": "input type for inserting array relation for remote table \"libaray.users\"",
-                    "fields": null,
-                    "inputFields": [
-                        {
-                            "name": "data",
-                            "description": null,
-                            "type": {
-                                "kind": "NON_NULL",
-                                "name": null,
-                                "ofType": {
-                                    "kind": "LIST",
-                                    "name": null,
-                                    "ofType": {
-                                        "kind": "NON_NULL",
-                                        "name": null,
-                                        "ofType": {
-                                            "kind": "INPUT_OBJECT",
-                                            "name": "libaray_users_insert_input",
-                                            "ofType": null
-                                        }
-                                    }
-                                }
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "on_conflict",
-                            "description": "upsert condition",
-                            "type": {
-                                "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_on_conflict",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        }
-                    ],
-                    "interfaces": null,
                     "enumValues": null,
                     "possibleTypes": null
                 },
@@ -30015,77 +30565,6 @@
                     "possibleTypes": null
                 },
                 {
-                    "kind": "INPUT_OBJECT",
-                    "name": "libaray_users_max_order_by",
-                    "description": "order by max() on columns of table \"libaray.users\"",
-                    "fields": null,
-                    "inputFields": [
-                        {
-                            "name": "avater_url",
-                            "description": null,
-                            "type": {
-                                "kind": "ENUM",
-                                "name": "order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "bio",
-                            "description": null,
-                            "type": {
-                                "kind": "ENUM",
-                                "name": "order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "id",
-                            "description": null,
-                            "type": {
-                                "kind": "ENUM",
-                                "name": "order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "password",
-                            "description": null,
-                            "type": {
-                                "kind": "ENUM",
-                                "name": "order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "status",
-                            "description": null,
-                            "type": {
-                                "kind": "ENUM",
-                                "name": "order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "username",
-                            "description": null,
-                            "type": {
-                                "kind": "ENUM",
-                                "name": "order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        }
-                    ],
-                    "interfaces": null,
-                    "enumValues": null,
-                    "possibleTypes": null
-                },
-                {
                     "kind": "OBJECT",
                     "name": "libaray_users_min_fields",
                     "description": "aggregate min on columns",
@@ -30169,77 +30648,6 @@
                     "possibleTypes": null
                 },
                 {
-                    "kind": "INPUT_OBJECT",
-                    "name": "libaray_users_min_order_by",
-                    "description": "order by min() on columns of table \"libaray.users\"",
-                    "fields": null,
-                    "inputFields": [
-                        {
-                            "name": "avater_url",
-                            "description": null,
-                            "type": {
-                                "kind": "ENUM",
-                                "name": "order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "bio",
-                            "description": null,
-                            "type": {
-                                "kind": "ENUM",
-                                "name": "order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "id",
-                            "description": null,
-                            "type": {
-                                "kind": "ENUM",
-                                "name": "order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "password",
-                            "description": null,
-                            "type": {
-                                "kind": "ENUM",
-                                "name": "order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "status",
-                            "description": null,
-                            "type": {
-                                "kind": "ENUM",
-                                "name": "order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "username",
-                            "description": null,
-                            "type": {
-                                "kind": "ENUM",
-                                "name": "order_by",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        }
-                    ],
-                    "interfaces": null,
-                    "enumValues": null,
-                    "possibleTypes": null
-                },
-                {
                     "kind": "OBJECT",
                     "name": "libaray_users_mutation_response",
                     "description": "response of any mutation on the table \"libaray.users\"",
@@ -30287,41 +30695,6 @@
                     ],
                     "inputFields": null,
                     "interfaces": [],
-                    "enumValues": null,
-                    "possibleTypes": null
-                },
-                {
-                    "kind": "INPUT_OBJECT",
-                    "name": "libaray_users_obj_rel_insert_input",
-                    "description": "input type for inserting object relation for remote table \"libaray.users\"",
-                    "fields": null,
-                    "inputFields": [
-                        {
-                            "name": "data",
-                            "description": null,
-                            "type": {
-                                "kind": "NON_NULL",
-                                "name": null,
-                                "ofType": {
-                                    "kind": "INPUT_OBJECT",
-                                    "name": "libaray_users_insert_input",
-                                    "ofType": null
-                                }
-                            },
-                            "defaultValue": null
-                        },
-                        {
-                            "name": "on_conflict",
-                            "description": "upsert condition",
-                            "type": {
-                                "kind": "INPUT_OBJECT",
-                                "name": "libaray_users_on_conflict",
-                                "ofType": null
-                            },
-                            "defaultValue": null
-                        }
-                    ],
-                    "interfaces": null,
                     "enumValues": null,
                     "possibleTypes": null
                 },
@@ -44831,6 +45204,180 @@
                     "description": "User account information. Don't modify its structure as Hasura Auth relies on it to function properly.",
                     "fields": [
                         {
+                            "name": "UserReview",
+                            "description": "An array relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "libaray_Review_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "libaray_Review_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "libaray_Review_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "LIST",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "OBJECT",
+                                            "name": "libaray_Review",
+                                            "ofType": null
+                                        }
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "UserReview_aggregate",
+                            "description": "An aggregate relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "libaray_Review_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "libaray_Review_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "libaray_Review_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "libaray_Review_aggregate",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "activeMfaType",
                             "description": null,
                             "args": [],
@@ -44854,6 +45401,18 @@
                                     "name": "String",
                                     "ofType": null
                                 }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "category_id",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "uuid",
+                                "ofType": null
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -45904,6 +46463,354 @@
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
+                        },
+                        {
+                            "name": "user_fav",
+                            "description": "An array relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "libaray_Favorite_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "libaray_Favorite_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "libaray_Favorite_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "LIST",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "OBJECT",
+                                            "name": "libaray_Favorite",
+                                            "ofType": null
+                                        }
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "user_fav_aggregate",
+                            "description": "An aggregate relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "libaray_Favorite_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "libaray_Favorite_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "libaray_Favorite_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "libaray_Favorite_aggregate",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "user_reading",
+                            "description": "An array relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "libaray_Reading_history_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "libaray_Reading_history_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "libaray_Reading_history_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "LIST",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "OBJECT",
+                                            "name": "libaray_Reading_history",
+                                            "ofType": null
+                                        }
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "user_reading_aggregate",
+                            "description": "An aggregate relationship",
+                            "args": [
+                                {
+                                    "name": "distinct_on",
+                                    "description": "distinct select on columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "ENUM",
+                                                "name": "libaray_Reading_history_select_column",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "limit",
+                                    "description": "limit the number of rows returned",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "offset",
+                                    "description": "skip the first n rows. Use only with order_by",
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Int",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "order_by",
+                                    "description": "sort the rows by one or more columns",
+                                    "type": {
+                                        "kind": "LIST",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "NON_NULL",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "INPUT_OBJECT",
+                                                "name": "libaray_Reading_history_order_by",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                },
+                                {
+                                    "name": "where",
+                                    "description": "filter the rows returned",
+                                    "type": {
+                                        "kind": "INPUT_OBJECT",
+                                        "name": "libaray_Reading_history_bool_exp",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "libaray_Reading_history_aggregate",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
                         }
                     ],
                     "inputFields": null,
@@ -46372,6 +47279,26 @@
                     "fields": null,
                     "inputFields": [
                         {
+                            "name": "UserReview",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Review_bool_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "UserReview_aggregate",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Review_aggregate_bool_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
                             "name": "_and",
                             "description": null,
                             "type": {
@@ -46433,6 +47360,16 @@
                             "type": {
                                 "kind": "INPUT_OBJECT",
                                 "name": "String_comparison_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "category_id",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "uuid_comparison_exp",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -46756,6 +47693,46 @@
                                 "ofType": null
                             },
                             "defaultValue": null
+                        },
+                        {
+                            "name": "user_fav",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Favorite_bool_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "user_fav_aggregate",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Favorite_aggregate_bool_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "user_reading",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Reading_history_bool_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "user_reading_aggregate",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Reading_history_aggregate_bool_exp",
+                                "ofType": null
+                            },
+                            "defaultValue": null
                         }
                     ],
                     "interfaces": null,
@@ -46869,6 +47846,16 @@
                     "fields": null,
                     "inputFields": [
                         {
+                            "name": "UserReview",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Review_arr_rel_insert_input",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
                             "name": "activeMfaType",
                             "description": null,
                             "type": {
@@ -46884,6 +47871,16 @@
                             "type": {
                                 "kind": "SCALAR",
                                 "name": "String",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "category_id",
+                            "description": null,
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "uuid",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -47167,6 +48164,26 @@
                                 "ofType": null
                             },
                             "defaultValue": null
+                        },
+                        {
+                            "name": "user_fav",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Favorite_arr_rel_insert_input",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "user_reading",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Reading_history_arr_rel_insert_input",
+                                "ofType": null
+                            },
+                            "defaultValue": null
                         }
                     ],
                     "interfaces": null,
@@ -47197,6 +48214,18 @@
                             "type": {
                                 "kind": "SCALAR",
                                 "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "category_id",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "uuid",
                                 "ofType": null
                             },
                             "isDeprecated": false,
@@ -47451,6 +48480,16 @@
                             "defaultValue": null
                         },
                         {
+                            "name": "category_id",
+                            "description": null,
+                            "type": {
+                                "kind": "ENUM",
+                                "name": "order_by",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
                             "name": "createdAt",
                             "description": null,
                             "type": {
@@ -47659,6 +48698,18 @@
                             "type": {
                                 "kind": "SCALAR",
                                 "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "category_id",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "uuid",
                                 "ofType": null
                             },
                             "isDeprecated": false,
@@ -47904,6 +48955,16 @@
                         },
                         {
                             "name": "avatarUrl",
+                            "description": null,
+                            "type": {
+                                "kind": "ENUM",
+                                "name": "order_by",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "category_id",
                             "description": null,
                             "type": {
                                 "kind": "ENUM",
@@ -48247,6 +49308,16 @@
                     "fields": null,
                     "inputFields": [
                         {
+                            "name": "UserReview_aggregate",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Review_aggregate_order_by",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
                             "name": "activeMfaType",
                             "description": null,
                             "type": {
@@ -48258,6 +49329,16 @@
                         },
                         {
                             "name": "avatarUrl",
+                            "description": null,
+                            "type": {
+                                "kind": "ENUM",
+                                "name": "order_by",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "category_id",
                             "description": null,
                             "type": {
                                 "kind": "ENUM",
@@ -48545,6 +49626,26 @@
                                 "ofType": null
                             },
                             "defaultValue": null
+                        },
+                        {
+                            "name": "user_fav_aggregate",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Favorite_aggregate_order_by",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "user_reading_aggregate",
+                            "description": null,
+                            "type": {
+                                "kind": "INPUT_OBJECT",
+                                "name": "libaray_Reading_history_aggregate_order_by",
+                                "ofType": null
+                            },
+                            "defaultValue": null
                         }
                     ],
                     "interfaces": null,
@@ -48613,6 +49714,12 @@
                         },
                         {
                             "name": "avatarUrl",
+                            "description": "column name",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "category_id",
                             "description": "column name",
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -48850,6 +49957,16 @@
                             "type": {
                                 "kind": "SCALAR",
                                 "name": "String",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
+                            "name": "category_id",
+                            "description": null,
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "uuid",
                                 "ofType": null
                             },
                             "defaultValue": null
@@ -49151,6 +50268,16 @@
                             "defaultValue": null
                         },
                         {
+                            "name": "category_id",
+                            "description": null,
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "uuid",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        },
+                        {
                             "name": "createdAt",
                             "description": null,
                             "type": {
@@ -49401,6 +50528,12 @@
                         },
                         {
                             "name": "avatarUrl",
+                            "description": "column name",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "category_id",
                             "description": "column name",
                             "isDeprecated": false,
                             "deprecationReason": null

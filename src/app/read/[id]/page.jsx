@@ -4,9 +4,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import { useParams } from 'next/navigation';
-import { FaArrowLeft, FaArrowRight, FaBook, FaMinus, FaPlus, FaAlignRight, FaAlignCenter, FaHome } from 'react-icons/fa';
+import { FaArrowLeft, FaArrowRight, FaBook, FaMinus, FaPlus, FaAlignRight, FaAlignCenter, FaHome, FaSave } from 'react-icons/fa';
 import Link from 'next/link';
-import { useReadingProgress } from '@/context/ReadingProgressContext';
+import { useReadingHistory } from '@/hooks/useReadingHistory'; // 1. استيراد الـ Hook الصحيح
 
 // الاستعلام الأول: لجلب محتوى الفصل ومعرّف الكتاب (book__id)
 const GET_CHAPTER_CONTENT = gql`
@@ -37,12 +37,15 @@ const GET_BOOK_NAVIGATION = gql`
 
 const ReadPage = () => {
   const params = useParams();
-  const { saveProgress } = useReadingProgress();
+  const { saveProgress } = useReadingHistory(); // 2. استخدام الـ Hook الجديد
 
   const [fontSize, setFontSize] = useState(20);
   const [textAlign, setTextAlign] = useState('text-right');
   const [isNavVisible, setIsNavVisible] = useState(true);
   const lastScrollY = useRef(0);
+  
+  // 3. إضافة حالة لرسالة تأكيد الحفظ
+  const [saveStatus, setSaveStatus] = useState('');
 
   // تنفيذ الاستعلام الأول
   const { data: chapterData, loading: chapterLoading, error: chapterError } = useQuery(GET_CHAPTER_CONTENT, {
@@ -53,7 +56,7 @@ const ReadPage = () => {
   const chapter = chapterData?.libaray_Chapter_by_pk;
   const bookId = chapter?.book__id;
 
-  // تنفيذ الاستعلام الثاني (فقط بعد الحصول على bookId من الاستعلام الأول)
+  // تنفيذ الاستعلام الثاني
   const { data: bookData, loading: bookLoading, error: bookError } = useQuery(GET_BOOK_NAVIGATION, {
     variables: { bookId: bookId },
     skip: !bookId,
@@ -96,11 +99,20 @@ const ReadPage = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (book?.id && chapter?.id) {
-      saveProgress(book.id, chapter.id);
-    }
-  }, [book?.id, chapter?.id, saveProgress]);
+  // 4. دالة الحفظ اليدوي
+  const handleSaveProgress = () => {
+    if (!bookId || !chapter?.id || !chapter?.chapter_num) return;
+
+    setSaveStatus('جاري الحفظ...');
+    const chapterLabel = `الفصل ${chapter.chapter_num}`;
+    // إرسال معرّف الكتاب، معرّف الفصل، واسم الفصل
+    saveProgress(bookId, chapter.id, chapterLabel);
+    
+    setTimeout(() => {
+      setSaveStatus('تم الحفظ بنجاح!');
+      setTimeout(() => setSaveStatus(''), 2000);
+    }, 1000);
+  };
 
   if (loading) {
     return <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900"><p className="text-xl animate-pulse">جاري تحميل الفصل...</p></div>;
@@ -171,8 +183,8 @@ const ReadPage = () => {
 
       <main className="container mx-auto max-w-3xl px-4 sm:px-6 pt-24 pb-24">
         <header className="mb-10 text-center">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">{chapter.title}</h1>
-            <p className="text-md text-gray-500 dark:text-gray-400 mt-2">الفصل رقم {chapter.chapter_num}</p>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">{chapter.title}</h1>
+          <p className="text-md text-gray-500 dark:text-gray-400 mt-2">الفصل رقم {chapter.chapter_num}</p>
         </header>
 
         <article 
@@ -185,23 +197,36 @@ const ReadPage = () => {
 
       <footer className={`fixed bottom-0 left-0 right-0 z-20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-top transition-transform duration-300 ${isNavVisible ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="container mx-auto max-w-5xl px-4 py-4 flex justify-between items-center">
-            {nextChapter ? (
-              <Link href={`/read/${nextChapter.id}`} className="flex items-center gap-2 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-                  <span>الفصل التالي</span>
-                  <FaArrowLeft />
-              </Link>
-            ) : <div className="w-36"></div>}
-            
-            <span className="font-bold text-gray-700 dark:text-gray-300 truncate px-4">
-              {book?.title}
-            </span>
+          {nextChapter ? (
+            <Link href={`/read/${nextChapter.id}`} className="flex items-center gap-2 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+              <span>الفصل التالي</span>
+              <FaArrowLeft />
+            </Link>
+          ) : <div className="w-36"></div>}
+          
+          {/* 5. إضافة زر الحفظ ورسالة الحالة */}
+          <div className="flex flex-col items-center">
+            <button
+              onClick={handleSaveProgress}
+              className="flex items-center gap-2 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-green-400"
+              disabled={!bookId || !chapter}
+            >
+              <FaSave />
+              <span>حفظ التقدم</span>
+            </button>
+            {saveStatus && (
+              <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 transition-opacity duration-300">
+                {saveStatus}
+              </p>
+            )}
+          </div>
 
-            {prevChapter ? (
-              <Link href={`/read/${prevChapter.id}`} className="flex items-center gap-2 px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
-                  <FaArrowRight />
-                  <span>الفصل السابق</span>
-              </Link>
-            ) : <div className="w-36"></div>}
+          {prevChapter ? (
+            <Link href={`/read/${prevChapter.id}`} className="flex items-center gap-2 px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
+              <FaArrowRight />
+              <span>الفصل السابق</span>
+            </Link>
+          ) : <div className="w-36"></div>}
         </div>
       </footer>
     </div>
