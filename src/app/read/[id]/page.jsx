@@ -6,7 +6,7 @@ import { useQuery, gql } from '@apollo/client';
 import { useParams } from 'next/navigation';
 import { FaArrowLeft, FaArrowRight, FaBook, FaMinus, FaPlus, FaAlignRight, FaAlignCenter, FaHome, FaSave } from 'react-icons/fa';
 import Link from 'next/link';
-import { useReadingHistory } from '@/hooks/useReadingHistory'; // 1. استيراد الـ Hook الصحيح
+import { useReadingHistory } from '@/hooks/useReadingHistory';
 
 // الاستعلام الأول: لجلب محتوى الفصل ومعرّف الكتاب (book__id)
 const GET_CHAPTER_CONTENT = gql`
@@ -37,14 +37,13 @@ const GET_BOOK_NAVIGATION = gql`
 
 const ReadPage = () => {
   const params = useParams();
-  const { saveProgress } = useReadingHistory(); // 2. استخدام الـ Hook الجديد
+  const { saveProgress } = useReadingHistory();
 
   const [fontSize, setFontSize] = useState(20);
   const [textAlign, setTextAlign] = useState('text-right');
   const [isNavVisible, setIsNavVisible] = useState(true);
   const lastScrollY = useRef(0);
   
-  // 3. إضافة حالة لرسالة تأكيد الحفظ
   const [saveStatus, setSaveStatus] = useState('');
 
   // تنفيذ الاستعلام الأول
@@ -99,14 +98,12 @@ const ReadPage = () => {
     };
   }, []);
 
-  // 4. دالة الحفظ اليدوي
   const handleSaveProgress = () => {
-    if (!bookId || !chapter?.id || !chapter?.chapter_num) return;
+    if (!bookId || !chapter?.chapter_num) return;
 
     setSaveStatus('جاري الحفظ...');
     const chapterLabel = `الفصل ${chapter.chapter_num}`;
-    // إرسال معرّف الكتاب، معرّف الفصل، واسم الفصل
-    saveProgress(bookId, chapter.id, chapterLabel);
+    saveProgress(bookId, chapterLabel);
     
     setTimeout(() => {
       setSaveStatus('تم الحفظ بنجاح!');
@@ -204,7 +201,6 @@ const ReadPage = () => {
             </Link>
           ) : <div className="w-36"></div>}
           
-          {/* 5. إضافة زر الحفظ ورسالة الحالة */}
           <div className="flex flex-col items-center">
             <button
               onClick={handleSaveProgress}

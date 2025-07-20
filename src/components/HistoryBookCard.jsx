@@ -15,7 +15,7 @@ const GET_BOOK_DETAILS_FOR_HISTORY = gql`
   }
 `;
 
-const HistoryBookCard = ({ bookId, lastRead, chapterId }) => {
+const HistoryBookCard = ({ bookId, lastRead }) => {
   const { loading, error, data } = useQuery(GET_BOOK_DETAILS_FOR_HISTORY, {
     variables: { bookId },
   });
@@ -25,10 +25,8 @@ const HistoryBookCard = ({ bookId, lastRead, chapterId }) => {
   if (loading) return <div className="bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse h-[320px]"></div>;
   if (error || !book) return null; 
 
-  // --- بداية التعديل: استخدام chapterId في الرابط ---
   return (
-    <Link href={`/read/${chapterId}`} className="block group">
-    {/* --- نهاية التعديل --- */}
+    <Link href={`/books/${book.id}?continue_from=${encodeURIComponent(lastRead)}`} className="block group">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 group-hover:-translate-y-2">
         <img
           src={book.coverImage || 'https://placehold.co/250x375/e2e8f0/4a5568?text=No+Image'}

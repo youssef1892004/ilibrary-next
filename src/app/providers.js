@@ -1,29 +1,34 @@
 // src/app/providers.js
 "use client";
 
-import React from 'react';
-import { ApolloProvider } from '@apollo/client';
-import apolloClient from '../lib/apollo';
-import { AuthProvider } from '../context/AuthContext';
-import { FavoritesProvider } from '../context/FavoritesContext';
-import { LanguageProvider } from '../context/LanguageContext';
-import { ReadingProgressProvider } from '../context/ReadingProgressContext';
-import ThemeProvider from '@/context/ThemeProvider';
+import { ApolloProvider } from "@apollo/client";
+import client from "@/lib/apollo";
+import { AuthProvider } from "@/context/AuthContext";
+import { FavoritesProvider } from "@/context/FavoritesContext";
+import { LanguageProvider } from "@/context/LanguageContext";
+import { ThemeProvider } from "next-themes"; // <--  1. تم التعديل لاستيرادها مباشرة من المكتبة
+import { useEffect } from "react";
 
 export function Providers({ children }) {
+  useEffect(() => {
+    // هذا الكود سيتم تنفيذه مرة واحدة فقط عند تحميل الموقع
+    // ملاحظة: هذا سيمسح كل شيء، بما في ذلك بيانات تسجيل دخول المستخدم إذا كانت محفوظة هنا.
+    // localStorage.clear(); 
+    // console.log("LocalStorage has been cleared on new visit.");
+  }, []);
+
   return (
-    <ApolloProvider client={apolloClient}>
-      <AuthProvider>
-        <FavoritesProvider>
-          <LanguageProvider>
-            <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-              <ReadingProgressProvider>
-                {children}
-              </ReadingProgressProvider>
+    <ApolloProvider client={client}>
+      <LanguageProvider>
+        <AuthProvider>
+          <FavoritesProvider>
+            {/* 2. التأكد من أن ThemeProvider يحيط بالمحتوى */}
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              {children}
             </ThemeProvider>
-          </LanguageProvider>
-        </FavoritesProvider>
-      </AuthProvider>
+          </FavoritesProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </ApolloProvider>
   );
 }

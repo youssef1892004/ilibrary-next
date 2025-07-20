@@ -6,7 +6,7 @@ import { useQuery, gql } from '@apollo/client';
 import { useAuth } from '@/context/AuthContext';
 import HistoryBookCard from './HistoryBookCard';
 
-// تم إزالة last_read_chapter_id من هنا
+// استعلام لجلب البيانات الأساسية فقط من السجل
 const GET_READING_HISTORY_BASIC = gql`
   query GetReadingHistoryBasic($userId: uuid!) {
     libaray_Reading_history(
@@ -23,6 +23,7 @@ const GET_READING_HISTORY_BASIC = gql`
 
 const ContinueReading = () => {
   const { user } = useAuth();
+
   const { loading, error, data } = useQuery(GET_READING_HISTORY_BASIC, {
     variables: { userId: user?.id },
     skip: !user,
@@ -30,7 +31,9 @@ const ContinueReading = () => {
 
   const historyItems = data?.libaray_Reading_history || [];
 
-  if (!user || loading || error || historyItems.length === 0) return null;
+  if (!user || loading || error || historyItems.length === 0) {
+    return null;
+  }
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900 py-16">

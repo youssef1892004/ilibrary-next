@@ -1,15 +1,14 @@
 // src/components/Navbar.jsx
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { FaBars, FaTimes, FaHeart, FaBookmark } from "react-icons/fa"; // 1. إضافة أيقونة جديدة
+import { FaBars, FaTimes, FaHeart, FaBookmark } from "react-icons/fa";
 import ThemeSwitcher from "@/context/ThemeSwitcher";
-import ReadingHistoryDropdown from "./ReadingHistoryDropdown"; // 2. استيراد المكون الجديد
 
 const NavLink = ({ href, children, onClick }) => (
   <Link href={href} onClick={onClick} className="nav-link">
@@ -19,11 +18,6 @@ const NavLink = ({ href, children, onClick }) => (
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // --- بداية التعديلات ---
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const historyRef = useRef(null);
-  // --- نهاية التعديلات ---
-
   const { user, logout, isLoading } = useAuth();
   const { favorites } = useFavorites();
   const { t } = useLanguage();
@@ -37,20 +31,6 @@ export default function Navbar() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  // --- بداية التعديلات: منطق إغلاق القائمة عند الضغط خارجها ---
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (historyRef.current && !historyRef.current.contains(event.target)) {
-        setIsHistoryOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-  // --- نهاية التعديلات ---
 
   const navLinks = [
     { href: "/", label: t.home || "الرئيسية" },
@@ -91,20 +71,17 @@ export default function Navbar() {
               )}
             </Link>
 
-            {/* --- بداية التعديلات: إضافة أيقونة سجل القراءة --- */}
+            {/* --- بداية التعديل: تحويل الزر إلى رابط --- */}
             {user && (
-              <div className="relative" ref={historyRef}>
-                <button 
-                  onClick={() => setIsHistoryOpen(!isHistoryOpen)} 
-                  className="icon-button"
-                  aria-label="سجل القراءة"
-                >
-                  <FaBookmark size={22} />
-                </button>
-                {isHistoryOpen && <ReadingHistoryDropdown />}
-              </div>
+              <Link 
+                href="/history" 
+                className="icon-button"
+                aria-label="سجل القراءة"
+              >
+                <FaBookmark size={22} />
+              </Link>
             )}
-            {/* --- نهاية التعديلات --- */}
+            {/* --- نهاية التعديل --- */}
 
             <div className="hidden sm:flex items-center gap-4">
               {isLoading ? (
@@ -137,7 +114,33 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-gray-800 dark:bg-gray-900 border-t border-gray-700">
-          {/* ... (الكود هنا يبقى كما هو) ... */}
+          <nav className="flex flex-col p-4 space-y-2">
+            {navLinks.map((link) => (
+              <NavLink key={link.href} href={link.href} onClick={() => setIsMobileMenuOpen(false)}>{link.label}</NavLink>
+            ))}
+             <div className="border-t border-gray-700 pt-4 mt-2 space-y-3">
+               {isLoading ? (
+                 <p className="px-2 text-base font-medium mb-3">...</p>
+               ) : user ? (
+                   <>
+                     <div className="px-2 text-base font-medium mb-3">
+                       <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                         مرحباً، {user.displayName || user.email}
+                       </Link>
+                     </div>
+                     <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="w-full btn-primary-outline">
+                       {t.logout || "خروج"}
+                     </button>
+                   </>
+               ) : (
+                   <>
+                     <Link href="/auth" className="block w-full btn-primary-outline text-center" onClick={() => setIsMobileMenuOpen(false)}>
+                       {t.login || "دخول"}
+                     </Link>
+                   </>
+               )}
+             </div>
+          </nav>
         </div>
       )}
     </header>

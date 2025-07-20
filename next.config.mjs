@@ -22,13 +22,20 @@ const nextConfig = {
         port: '',
         pathname: '/avatar/**',
       },
-      // --- الإضافة الجديدة هنا ---
       {
         protocol: 'https',
         hostname: 'infos-it.fr',
         port: '',
         pathname: '/wp-content/uploads/**',
       },
+      // --- بداية الإضافة الجديدة ---
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+        port: '',
+        pathname: '/**',
+      },
+      // --- نهاية الإضافة الجديدة ---
     ],
   },
 };

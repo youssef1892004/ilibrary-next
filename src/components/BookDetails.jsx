@@ -4,16 +4,28 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaUserAlt, FaCalendarAlt, FaBook, FaListOl, FaBarcode, FaFileAlt, FaTag } from 'react-icons/fa';
+import { useSearchParams } from 'next/navigation'; // 1. استيراد Hook جديد
+import { FaUserAlt, FaCalendarAlt, FaBook, FaBarcode, FaFileAlt, FaTag, FaBookmark } from 'react-icons/fa';
 import { useLanguage } from '@/context/LanguageContext';
 
 const BookDetails = ({ book }) => {
   const { t } = useLanguage();
+  const searchParams = useSearchParams(); // 2. استخدام الـ Hook
+
+  // 3. قراءة "آخر فصل" من الرابط
+  const continueFromChapterLabel = searchParams.get('continue_from');
 
   const author = book.Book_Author?.[0];
   const category = book.book_category?.[0];
   const chapters = book.Bookchapters || [];
   
+  // --- بداية التعديل: إضافة زر "أكمل القراءة" ---
+  // البحث عن الفصل الذي يتطابق اسمه مع ما تم تمريره في الرابط
+  const continueChapterObject = continueFromChapterLabel 
+    ? chapters.find(ch => `الفصل ${ch.chapter_num}` === continueFromChapterLabel)
+    : null;
+  // --- نهاية التعديل ---
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 mb-16">
@@ -37,7 +49,6 @@ const BookDetails = ({ book }) => {
               </span>
             </div>
           )}
-
           <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-2">{book.title}</h1>
           
           {author && (
@@ -45,10 +56,27 @@ const BookDetails = ({ book }) => {
               <Link href={`/writers/${author.id}`} className="text-xl text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors inline-flex items-center gap-2">
                 <FaUserAlt />
                 <span>{author.name || 'غير معروف'}</span>
-              </Link> {/* --- تم تصحيح الخطأ الإملائي هنا --- */}
+              </Link>
             </div>
           )}
           
+          {/* --- بداية التعديل: إضافة زر "أكمل القراءة" هنا --- */}
+          {continueChapterObject && (
+            <div className="my-6 p-4 bg-purple-50 dark:bg-gray-700 rounded-lg border border-purple-200 dark:border-gray-600">
+              <p className="font-bold text-gray-800 dark:text-white mb-2">
+                لقد توقفت هنا:
+              </p>
+              <Link href={`/read/${continueChapterObject.id}`} className="flex items-center justify-between bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors w-full text-center">
+                <span>{`الفصل ${continueChapterObject.chapter_num}: ${continueChapterObject.title}`}</span>
+                <span className="flex items-center gap-2">
+                  <FaBookmark />
+                  أكمل القراءة
+                </span>
+              </Link>
+            </div>
+          )}
+          {/* --- نهاية التعديل --- */}
+
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
             {book.description}
           </p>
@@ -71,9 +99,9 @@ const BookDetails = ({ book }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {chapters.map((chapter) => (
               <Link href={`/read/${chapter.id}`} key={chapter.id}>
-                <div className="block p-4 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg hover:border-purple-500 border-2 border-transparent transition-all duration-300 transform hover:-translate-y-1">
+                <div className="block p-4 rounded-lg shadow hover:shadow-lg border-2 bg-white dark:bg-gray-800 border-transparent transition-all duration-300 transform hover:-translate-y-1">
                   <p className="font-semibold text-gray-700 dark:text-gray-300 truncate">
-                    <span className="text-purple-600 dark:text-purple-400">الفصل {chapter.chapter_num}:</span> {chapter.title}
+                    <span className="text-purple-600 dark:text-purple-400">{`الفصل ${chapter.chapter_num}`}:</span> {chapter.title}
                   </p>
                 </div>
               </Link>

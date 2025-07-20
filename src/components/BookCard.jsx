@@ -5,17 +5,21 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaHeart, FaRegHeart, FaBookOpen, FaUserAlt, FaTag } from 'react-icons/fa';
-import { useFavorites } from '@/context/FavoritesContext';
+import { useDbFavorites } from '@/hooks/useDbFavorites'; // 1. استيراد الـ Hook الجديد
 import { useLanguage } from '@/context/LanguageContext';
+import { useAuth } from '@/context/AuthContext'; // 2. استيراد useAuth للتحقق من المستخدم
 
 const BookCard = ({ book, authorName: authorNameFromProp }) => {
   if (!book) {
     return null; 
   }
 
-  const { favorites, addFavorite, removeFavorite } = useFavorites();
   const { t } = useLanguage();
-  const isFavorite = favorites.some((fav) => fav.id === book.id);
+  const { user } = useAuth(); // 3. جلب المستخدم الحالي
+  const { addFavorite, removeFavorite, isFavorite, loading: favoritesLoading } = useDbFavorites(); // 4. استخدام الـ Hook الجديد
+
+  // 5. التحقق إذا كان الكتاب في المفضلة
+  const favoriteStatus = isFavorite(book.id);
 
   const authorName = authorNameFromProp || book.Book_Author?.[0]?.name;
   const categoryName = book.book_category?.[0]?.name;
@@ -23,17 +27,18 @@ const BookCard = ({ book, authorName: authorNameFromProp }) => {
   const handleFavoriteClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isFavorite) {
+
+    // 6. التأكد من أن المستخدم قد سجل دخوله قبل الإضافة/الحذف
+    if (!user) {
+      // يمكنك هنا إظهار رسالة للمستخدم تطلب منه تسجيل الدخول
+      alert("يرجى تسجيل الدخول أولاً لإضافة الكتب إلى المفضلة.");
+      return;
+    }
+    
+    if (favoriteStatus) {
       removeFavorite(book.id);
     } else {
-      const bookToAdd = {
-        id: book.id,
-        title: book.title,
-        coverImage: book.coverImage,
-        Book_Author: [{ name: authorName }],
-        book_category: [{ name: categoryName }]
-      };
-      addFavorite(bookToAdd); 
+      addFavorite(book.id); 
     }
   };
 
@@ -67,13 +72,11 @@ const BookCard = ({ book, authorName: authorNameFromProp }) => {
           </h3>
         </Link>
 
-        {/* --- بداية التعديل: تكبير الخط وجعله BOLD --- */}
         {authorName && (
           <p className="text-lg text-gray-700 dark:text-gray-300 font-bold mb-3 truncate">
             {t.by || "بواسطة"}: {authorName}
           </p>
         )}
-        {/* --- نهاية التعديل --- */}
         
         <div className="flex-grow"></div> 
 
@@ -90,8 +93,9 @@ const BookCard = ({ book, authorName: authorNameFromProp }) => {
             onClick={handleFavoriteClick}
             className="p-2.5 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
             aria-label="Toggle Favorite"
+            disabled={favoritesLoading} // تعطيل الزر أثناء تحميل البيانات
           >
-            {isFavorite ? (
+            {favoriteStatus ? (
               <FaHeart className="text-red-500" size={18} />
             ) : (
               <FaRegHeart className="text-gray-600 dark:text-gray-300" size={18} />
