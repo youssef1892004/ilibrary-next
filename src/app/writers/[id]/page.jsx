@@ -28,8 +28,8 @@ const GET_WRITER_DATA = gql`
       image_url
       bio
       book_num
-      # Assumes a relationship named 'Books' exists on the 'libaray_Autor' table
-      Books(order_by: {publicationDate: desc}) {
+      # Corrected relationship name from 'Books' to 'Book_Author'
+      Book_Author(order_by: {publicationDate: desc}) {
         id
         title
         coverImage
@@ -42,9 +42,9 @@ const GET_WRITER_DATA = gql`
 `;
 
 // generateMetadata for writer page SEO
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params: { id } }) {
   const client = createApolloClient();
-  const writerId = params.id;
+  const writerId = id;
 
   try {
     const { data } = await client.query({
@@ -75,12 +75,11 @@ export async function generateMetadata({ params }) {
 }
 
 // The main page component, now a Server Component
-const WriterProfilePage = async ({ params }) => {
+const WriterProfilePage = async ({ params: { id } }) => {
   const client = createApolloClient();
-  const writerId = params.id;
+  const writerId = id;
 
   let writer = null;
-  let error = null;
 
   try {
     const { data } = await client.query({
@@ -90,23 +89,16 @@ const WriterProfilePage = async ({ params }) => {
     writer = data?.libaray_Autor_by_pk;
   } catch (e) {
     console.error("Error fetching writer details on server:", e);
-    error = e;
-  }
-
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen text-red-500">
-        <p className="text-xl font-bold">حدث خطأ أثناء جلب البيانات.</p>
-        <p className="text-sm mt-2">يرجى المحاولة مرة أخرى لاحقًا.</p>
-      </div>
-    );
+    // The error is logged on the server.
+    // The component will proceed and `writer` will be null.
   }
 
   if (!writer) {
     notFound();
   }
 
-  const books = writer.Books || [];
+  // Use the correct relationship name 'Book_Author'
+  const books = writer.Book_Author || [];
 
   return <WriterProfileClient writer={writer} books={books} />;
 };

@@ -40,7 +40,6 @@ const GET_ALL_WRITERS = gql`
 const WritersPage = async () => {
   const client = createApolloClient();
   let writers = [];
-  let error = null;
 
   try {
     const { data } = await client.query({
@@ -49,15 +48,8 @@ const WritersPage = async () => {
     writers = data?.libaray_Autor || [];
   } catch (e) {
     console.error("Error fetching writers on server:", e);
-    error = e;
-  }
-
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen text-red-500">
-        <p className="text-xl font-bold">حدث خطأ أثناء جلب بيانات الكُتّاب.</p>
-      </div>
-    );
+    // In case of an error, writers will be an empty array,
+    // and the client component will handle displaying a "not found" message.
   }
 
   return <WritersPageClient writers={writers} />;

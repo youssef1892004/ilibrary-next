@@ -63,9 +63,9 @@ const GET_BOOK_DETAILS = gql`
 `;
 
 // generateMetadata function to set dynamic metadata
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params: { id } }) {
   const client = createApolloClient();
-  const bookId = params.id;
+  const bookId = id;
 
   try {
     const { data } = await client.query({
@@ -97,12 +97,11 @@ export async function generateMetadata({ params }) {
 }
 
 // The main page component, now a Server Component
-const BookDetailsPage = async ({ params }) => {
+const BookDetailsPage = async ({ params: { id } }) => {
   const client = createApolloClient();
-  const bookId = params.id;
+  const bookId = id;
 
   let book = null;
-  let error = null;
 
   try {
     const { data } = await client.query({
@@ -112,16 +111,8 @@ const BookDetailsPage = async ({ params }) => {
     book = data?.libaray_Book_by_pk;
   } catch (e) {
     console.error("Error fetching book details on server:", e);
-    error = e;
-  }
-
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen text-red-500">
-        <p className="text-xl font-bold">حدث خطأ أثناء جلب البيانات.</p>
-        <p className="text-sm mt-2">يرجى المحاولة مرة أخرى لاحقًا.</p>
-      </div>
-    );
+    // By not re-throwing or passing the error, we ensure nothing non-serializable is sent to the client.
+    // The component will proceed with `book` as null.
   }
 
   if (!book) {
