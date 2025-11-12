@@ -21,7 +21,7 @@ const GET_BOOK_DETAILS_FOR_FAVORITE = gql`
   }
 `;
 
-const FavoriteBookCard = ({ bookId }) => {
+const FavoriteBookCard = ({ bookId, sizes }) => {
   const { loading, error, data } = useQuery(GET_BOOK_DETAILS_FOR_FAVORITE, {
     variables: { bookId },
   });
@@ -35,7 +35,7 @@ const FavoriteBookCard = ({ bookId }) => {
   if (error || !book) return null; 
 
   // قم بإعادة استخدام مكون BookCard الأصلي مع تمرير بيانات الكتاب الكاملة له
-  return <BookCard book={book} />;
+  return <BookCard book={book} sizes={sizes} />;
 };
 
 export default FavoriteBookCard;

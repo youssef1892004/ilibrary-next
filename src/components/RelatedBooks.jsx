@@ -20,7 +20,7 @@ const RelatedBooks = ({ currentBookId, category }) => {
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {related.map(book => (
-          <BookCard key={book.id} book={book} />
+          <BookCard key={book.id} book={book} sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw" />
         ))}
       </div>
     </div>

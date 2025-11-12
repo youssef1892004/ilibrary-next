@@ -7,6 +7,11 @@ import Testimonials from '@/components/Testimonials';
 import ComingSoon from '@/components/ComingSoon';
 import ContinueReading from '@/components/ContinueReading'; // 1. استيراد المكون الجديد
 
+export const metadata = {
+  title: 'iLibrary - آلاف الكتب الإلكترونية المجانية بين يديك',
+  description: 'اكتشف واستكشف آلاف الكتب والروايات الإلكترونية المجانية في مختلف المجالات عبر مكتبة iLibrary، رفيقك الأول للقراءة أونلاين.',
+};
+
 export default function HomePage() {
   return (
     <main className="bg-white dark:bg-gray-900">

@@ -66,12 +66,14 @@ const ChangePasswordForm = () => {
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">تغيير كلمة المرور</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="input-group">
-                    <FaLock />
-                    <input type="password" name="newPassword" placeholder="كلمة المرور الجديدة" value={formData.newPassword} onChange={handleChange} required className="input-field" />
+                    <label htmlFor="newPassword" className="sr-only">كلمة المرور الجديدة</label>
+                    <FaLock aria-hidden="true" />
+                    <input type="password" id="newPassword" name="newPassword" placeholder="كلمة المرور الجديدة" value={formData.newPassword} onChange={handleChange} required className="input-field" />
                 </div>
                 <div className="input-group">
-                    <FaLock />
-                    <input type="password" name="confirmPassword" placeholder="تأكيد كلمة المرور الجديدة" value={formData.confirmPassword} onChange={handleChange} required className="input-field" />
+                    <label htmlFor="confirmPassword" className="sr-only">تأكيد كلمة المرور الجديدة</label>
+                    <FaLock aria-hidden="true" />
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="تأكيد كلمة المرور الجديدة" value={formData.confirmPassword} onChange={handleChange} required className="input-field" />
                 </div>
                 
                 {error && <p className="error-message">{error}</p>}

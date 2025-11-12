@@ -37,16 +37,16 @@ const Footer = () => {
           {/* Social Links */}
           <div className="text-center md:text-left">
             <div className="flex justify-center md:justify-start gap-3">
-              <a href="#" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-700 hover:bg-purple-600 rounded-full flex items-center justify-center transition-colors">
+              <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Facebook" className="w-9 h-9 bg-gray-700 hover:bg-purple-600 rounded-full flex items-center justify-center transition-colors">
                 <FaFacebookF size={14} />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-700 hover:bg-purple-600 rounded-full flex items-center justify-center transition-colors">
+              <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Twitter" className="w-9 h-9 bg-gray-700 hover:bg-purple-600 rounded-full flex items-center justify-center transition-colors">
                 <FaTwitter size={14} />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-700 hover:bg-purple-600 rounded-full flex items-center justify-center transition-colors">
+              <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" className="w-9 h-9 bg-gray-700 hover:bg-purple-600 rounded-full flex items-center justify-center transition-colors">
                 <FaInstagram size={14} />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-700 hover:bg-purple-600 rounded-full flex items-center justify-center transition-colors">
+              <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Follow us on LinkedIn" className="w-9 h-9 bg-gray-700 hover:bg-purple-600 rounded-full flex items-center justify-center transition-colors">
                 <FaLinkedinIn size={14} />
               </a>
             </div>

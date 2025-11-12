@@ -74,7 +74,7 @@ const LatestBooks = () => {
                 const authorName = book.Book_Author?.[0]?.name;
                 return (
                   <div key={book.id} className="w-72 flex-shrink-0">
-                    <BookCard book={book} authorName={authorName} />
+                    <BookCard book={book} authorName={authorName} sizes="288px" />
                   </div>
                 );
               })}

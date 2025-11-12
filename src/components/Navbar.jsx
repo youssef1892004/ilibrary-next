@@ -9,6 +9,7 @@ import { useFavorites } from "@/context/FavoritesContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { FaBars, FaTimes, FaHeart, FaBookmark } from "react-icons/fa";
 import ThemeSwitcher from "@/context/ThemeSwitcher";
+import logo from '../../public/logo.png';
 
 const NavLink = ({ href, children, onClick }) => (
   <Link href={href} onClick={onClick} className="nav-link">
@@ -46,7 +47,7 @@ export default function Navbar() {
           <div className="flex-shrink-0">
             <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
               <Image 
-                src="/logo.png" 
+                src={logo} 
                 alt="iLibrary Logo" 
                 width={105}
                 height={35}
@@ -64,7 +65,7 @@ export default function Navbar() {
           <div className="flex items-center justify-end gap-4 sm:gap-5">
             <ThemeSwitcher/>
             
-            <Link href="/favorites" className="icon-button relative">
+            <Link href="/favorites" className="icon-button relative" aria-label="View your favorites">
               <FaHeart className="hover:text-red-500" size={24} />
               {favorites.length > 0 && (
                 <span className="fav-badge">{favorites.length}</span>
@@ -103,7 +104,12 @@ export default function Navbar() {
             </div>
             
             <div className="md:hidden">
-              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="icon-button">
+              <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+                className="icon-button"
+                aria-label="Toggle mobile menu"
+                aria-expanded={isMobileMenuOpen}
+              >
                 {isMobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
               </button>
             </div>

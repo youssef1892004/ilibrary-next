@@ -11,7 +11,7 @@
 */
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-tajawal), var(--font-inter), Arial, Helvetica, sans-serif;
 }
 
 /* === تعديلات الـ Navbar تبدأ من هنا === */
@@ -38,4 +38,17 @@ body {
 }
 .chapter-content {
   white-space: pre-wrap;
+}
+
+/* Screen-reader only class for accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

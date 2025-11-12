@@ -9,7 +9,7 @@ import Image from 'next/image';
 const Hero = () => {
   const { t } = useLanguage();
 
-  const heroIllustrationUrl = 'https://res.cloudinary.com/dnveptlzm/image/upload/v1751317304/auth-image_rjnuwu.jpg';
+  const heroIllustrationUrl = 'https://res.cloudinary.com/dnveptlzm/image/upload/f_auto,q_auto/v1751317304/auth-image_rjnuwu.jpg';
 
   const heroText = {
     titleLine1: t.heroTitleLine1 || "بوابتك إلى المعرفة",
@@ -50,10 +50,12 @@ const Hero = () => {
               <Image 
                 src={heroIllustrationUrl} 
                 alt="أشخاص يقرؤون الكتب" 
-                width={500}
-                height={500}
+                width={1080}
+                height={609}
                 className="relative w-full max-w-lg mx-auto rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-500"
                 priority
+                fetchPriority="high"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 512px"
               />
               <div className="absolute -top-4 -left-4 w-8 h-8 bg-pink-400 rounded-full animate-bounce"></div>
               <div className="absolute -bottom-4 -right-4 w-6 h-6 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>

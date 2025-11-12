@@ -46,7 +46,7 @@ const AnimatedBookCovers = () => {
             <img 
               key={`${cover}-${imgIndex}`} 
               src={cover} 
-              alt={`Book Cover`} 
+              alt="" 
               className="book-cover-item" 
             />
           ))}
@@ -139,14 +139,17 @@ const AuthPage = () => {
           <form className="auth-form" onSubmit={handleSubmit}>
             {!isLogin && (
               <div className="input-group">
-                <FaUser /><input type="text" name="name" placeholder="الاسم الكامل" value={formData.name} onChange={handleChange} required />
+                <label htmlFor="name" className="sr-only">الاسم الكامل</label>
+                <FaUser aria-hidden="true" /><input type="text" id="name" name="name" placeholder="الاسم الكامل" value={formData.name} onChange={handleChange} required />
               </div>
             )}
             <div className="input-group">
-              <FaEnvelope /><input type="email" name="email" placeholder="البريد الإلكتروني" value={formData.email} onChange={handleChange} required />
+              <label htmlFor="email" className="sr-only">البريد الإلكتروني</label>
+              <FaEnvelope aria-hidden="true" /><input type="email" id="email" name="email" placeholder="البريد الإلكتروني" value={formData.email} onChange={handleChange} required />
             </div>
             <div className="input-group">
-              <FaLock /><input type="password" name="password" placeholder="كلمة المرور" value={formData.password} onChange={handleChange} required />
+              <label htmlFor="password" className="sr-only">كلمة المرور</label>
+              <FaLock aria-hidden="true" /><input type="password" id="password" name="password" placeholder="كلمة المرور" value={formData.password} onChange={handleChange} required />
             </div>
             
             {error && <p className="error-message">{error}</p>}

@@ -1,10 +1,11 @@
-import { Inter } from "next/font/google";
+import { Inter, Tajawal } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import ConditionalLayout from "@/components/ConditionalLayout";
 import Script from "next/script"; // ✅ مكون السكربت
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
+const tajawal = Tajawal({ subsets: ["arabic"], weight: ['400', '700'], variable: '--font-tajawal' });
 
 export const metadata = {
   title: "iLibrary - Your Online Reading Companion",
@@ -14,7 +15,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" dir="rtl" suppressHydrationWarning>
-      <body className={inter.className}>
+      <head>
+        <link rel="preconnect" href="https://graphql-333f98f9a304.hosted.ghaymah.systems" />
+      </head>
+      <body className={`${inter.variable} ${tajawal.variable} font-sans`}>
         <Providers>
           <ConditionalLayout>
             {children}

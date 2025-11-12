@@ -68,6 +68,7 @@ const LatestWriters = () => {
                   alt={writer.name}
                   width={128}
                   height={128}
+                  sizes="128px"
                 />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">{writer.name}</h3>

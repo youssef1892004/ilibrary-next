@@ -54,8 +54,9 @@ const ChangeEmailForm = () => {
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">تغيير البريد الإلكتروني</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="input-group">
-                    <FaEnvelope />
-                    <input type="email" placeholder="البريد الإلكتروني الجديد" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} required className="input-field" />
+                    <label htmlFor="newEmail" className="sr-only">البريد الإلكتروني الجديد</label>
+                    <FaEnvelope aria-hidden="true" />
+                    <input type="email" id="newEmail" name="newEmail" placeholder="البريد الإلكتروني الجديد" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} required className="input-field" />
                 </div>
                 
                 {error && <p className="error-message">{error}</p>}

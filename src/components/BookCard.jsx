@@ -9,7 +9,7 @@ import { useDbFavorites } from '@/hooks/useDbFavorites'; // 1. استيراد ا
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext'; // 2. استيراد useAuth للتحقق من المستخدم
 
-const BookCard = ({ book, authorName: authorNameFromProp }) => {
+const BookCard = ({ book, authorName: authorNameFromProp, sizes }) => {
   if (!book) {
     return null; 
   }
@@ -52,6 +52,7 @@ const BookCard = ({ book, authorName: authorNameFromProp }) => {
             width={250}
             height={375}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            sizes={sizes || '100vw'}
           />
         </div>
 
@@ -84,6 +85,7 @@ const BookCard = ({ book, authorName: authorNameFromProp }) => {
           <Link 
             href={`/books/${book.id}`} 
             className="flex-grow flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
+            aria-label={`اقرأ كتاب ${book.title}`}
           >
             <FaBookOpen />
             {t.readBook || "اقرأ الآن"}
