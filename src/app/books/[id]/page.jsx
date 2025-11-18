@@ -63,9 +63,10 @@ const GET_BOOK_DETAILS = gql`
 `;
 
 // generateMetadata function to set dynamic metadata
-export async function generateMetadata({ params: { id } }) {
+export async function generateMetadata({ params }) {
   const client = createApolloClient();
-  const bookId = id;
+  const awaitedParams = await params;
+  const bookId = awaitedParams.id;
 
   try {
     const { data } = await client.query({
@@ -97,9 +98,10 @@ export async function generateMetadata({ params: { id } }) {
 }
 
 // The main page component, now a Server Component
-const BookDetailsPage = async ({ params: { id } }) => {
+const BookDetailsPage = async ({ params }) => {
   const client = createApolloClient();
-  const bookId = id;
+  const awaitedParams = await params;
+  const bookId = awaitedParams.id;
 
   let book = null;
 

@@ -86,6 +86,28 @@ const BooksPageClient = () => {
 
   const books = data?.libaray_Book || [];
 
+  useEffect(() => {
+    console.log("--- Book Data Changed ---");
+    console.log("Current book array:", books);
+
+    const ids = books.map(b => b.id);
+    const missingIds = books.filter(b => !b.id);
+    if (missingIds.length > 0) {
+      console.error("Found books with missing IDs:", missingIds);
+    }
+
+    const idCounts = ids.reduce((acc, id) => {
+      acc[id] = (acc[id] || 0) + 1;
+      return acc;
+    }, {});
+
+    const duplicateIds = Object.keys(idCounts).filter(id => idCounts[id] > 1);
+    if (duplicateIds.length > 0) {
+      console.error("Found duplicate book IDs:", duplicateIds);
+      console.log("Books with duplicate IDs:", books.filter(b => duplicateIds.includes(b.id)));
+    }
+  }, [books]);
+
   const loadMore = useCallback(() => {
     if (loading || !hasMore) return;
     fetchMore({
@@ -161,8 +183,8 @@ const BooksPageClient = () => {
       {!error && (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {books.map((book) => (
-              <BookCard key={book.id} book={book} sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw" />
+            {books.map((book, index) => (
+              <BookCard key={book.id || index} book={book} sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw" />
             ))}
           </div>
           

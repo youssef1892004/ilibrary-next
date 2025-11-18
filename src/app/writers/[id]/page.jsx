@@ -42,9 +42,10 @@ const GET_WRITER_DATA = gql`
 `;
 
 // generateMetadata for writer page SEO
-export async function generateMetadata({ params: { id } }) {
+export async function generateMetadata({ params }) {
   const client = createApolloClient();
-  const writerId = id;
+  const awaitedParams = await params;
+  const writerId = awaitedParams.id;
 
   try {
     const { data } = await client.query({
@@ -75,9 +76,10 @@ export async function generateMetadata({ params: { id } }) {
 }
 
 // The main page component, now a Server Component
-const WriterProfilePage = async ({ params: { id } }) => {
+const WriterProfilePage = async ({ params }) => {
   const client = createApolloClient();
-  const writerId = id;
+  const awaitedParams = await params;
+  const writerId = awaitedParams.id;
 
   let writer = null;
 
