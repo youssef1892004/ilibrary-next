@@ -1,26 +1,24 @@
-# استخدم نسخة رسمية من Node
-FROM node:22-alpine
-
-# تحديد مجلد العمل داخل الكونتينر
+# Stage 1: Builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 
-# نسخ ملفات تعريف التبعيات أولاً للاستفادة من التخزين المؤقت لـ Docker
 COPY package.json package-lock.json ./
+RUN npm ci
 
-# تثبيت التبعيات
-RUN npm install
-
-# نسخ باقي ملفات المشروع
 COPY . .
-
-# بناء المشروع
 RUN npm run build
 
-# تعيين المتغير الخاص ببيئة الإنتاج
-ENV NODE_ENV production
+# Stage 2: Runner
+FROM node:22-alpine AS runner
+WORKDIR /app
 
-# تعيين البورت
+ENV NODE_ENV=production
+
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/package-lock.json ./
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/public ./public
+
 EXPOSE 3000
-
-# الأمر الذي يبدأ السيرفر
 CMD ["npm", "start"]

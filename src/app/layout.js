@@ -2,6 +2,8 @@ import { Inter, Tajawal } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import ConditionalLayout from "@/components/ConditionalLayout";
+import NotificationBanner from "@/components/NotificationBanner"; // Import the new component
+import FacebookNotification from "@/components/FacebookNotification"; // Import the new component
 import Script from "next/script"; // ✅ مكون السكربت
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
@@ -22,6 +24,8 @@ export default function RootLayout({ children }) {
         <Providers>
           <ConditionalLayout>
             {children}
+            <NotificationBanner />
+            <FacebookNotification />
           </ConditionalLayout>
         </Providers>
         {/* ✅ استبدال السكربت بهذا المكون */}
