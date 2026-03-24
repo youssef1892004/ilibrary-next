@@ -2,8 +2,11 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 
+# Install libc6-compat for sharp compatibility
+RUN apk add --no-cache libc6-compat
+
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 COPY . .
 RUN npm run build
@@ -12,7 +15,11 @@ RUN npm run build
 FROM node:22-alpine AS runner
 WORKDIR /app
 
+# Install libc6-compat for sharp compatibility
+RUN apk add --no-cache libc6-compat
+
 ENV NODE_ENV=production
+ENV NEXT_SHARP_PATH=/app/node_modules/sharp
 
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json ./

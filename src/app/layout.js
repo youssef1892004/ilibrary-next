@@ -10,18 +10,24 @@ const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const tajawal = Tajawal({ subsets: ["arabic"], weight: ['400', '700'], variable: '--font-tajawal' });
 
 export const metadata = {
-  title: "iLibrary - Your Online Reading Companion",
-  description: "Discover and read thousands of books online.",
+  title: "Muejam Library - Your Online Reading Companion",
+  description: "Discover and read thousands of books online at Muejam Library.",
 };
 
-export default function RootLayout({ children }) {
+import { getSession } from "@/lib/auth"; // Import auth helper
+import NextTopLoader from 'nextjs-toploader';
+
+export default async function RootLayout({ children }) {
+  const session = await getSession(); // Fetch session server-side
+
   return (
     <html lang="en" dir="rtl" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://graphql-333f98f9a304.hosted.ghaymah.systems" />
       </head>
       <body className={`${inter.variable} ${tajawal.variable} font-sans`}>
-        <Providers>
+        <NextTopLoader color="#9333ea" showSpinner={false} />
+        <Providers initialUser={session}> {/* Pass session to Providers */}
           <ConditionalLayout>
             {children}
             <NotificationBanner />

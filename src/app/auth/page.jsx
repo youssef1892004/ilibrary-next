@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import { useAuth } from '@/context/AuthContext';
 import { FaEnvelope, FaLock, FaUser, FaBookOpen } from 'react-icons/fa';
 import './AuthPage.css';
@@ -31,23 +32,23 @@ const AnimatedBookCovers = () => {
   return (
     <div className="animated-covers-container">
       {loopedColumns.map((column, colIndex) => (
-        <div 
-          key={colIndex} 
+        <div
+          key={colIndex}
           className="covers-track"
           // --- 2. تعديل الحركة لتعمل بشكل متعاكس ---
           // الأعمدة الزوجية (0, 2) تتحرك للأعلى (scrollVertical)
           // الأعمدة الفردية (1, 3) تتحرك للأسفل (scrollVerticalReverse)
-          style={{ 
+          style={{
             animationName: colIndex % 2 === 1 ? 'scrollVerticalReverse' : 'scrollVertical',
             animationDuration: `${60 + colIndex * 5}s` // تغيير السرعات بشكل طفيف لكل عمود
           }}
         >
           {column.map((cover, imgIndex) => (
-            <img 
-              key={`${cover}-${imgIndex}`} 
-              src={cover} 
-              alt="" 
-              className="book-cover-item" 
+            <img
+              key={`${cover}-${imgIndex}`}
+              src={cover}
+              alt=""
+              className="book-cover-item"
             />
           ))}
         </div>
@@ -64,10 +65,17 @@ const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login, user, isLoading: authIsLoading } = useAuth();
   const router = useRouter();
-  
+
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (user && !authIsLoading) {
+      router.push('/');
+    }
+  }, [user, authIsLoading, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -84,6 +92,7 @@ const AuthPage = () => {
         if (!response.ok) { throw new Error(data.message || "فشل تسجيل الدخول."); }
         login(data);
         router.push('/');
+        router.refresh(); // Ensure server components update with new cookie
       } else {
         const response = await fetch('/api/register', {
           method: 'POST',
@@ -96,7 +105,7 @@ const AuthPage = () => {
         });
         const result = await response.json();
         if (!response.ok) { throw new Error(result.message); }
-        alert('تم إنشاء حسابك بنجاح. يمكنك الآن تسجيل الدخول.');
+        toast.success('تم إنشاء حسابك بنجاح. يمكنك الآن تسجيل الدخول.');
         setIsLogin(true);
       }
     } catch (err) {
@@ -106,7 +115,7 @@ const AuthPage = () => {
     }
   };
 
-  if (authIsLoading || user) {
+  if (authIsLoading) { // Only show loading if checking auth status
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <p className="text-xl">جاري التحميل...</p>
@@ -121,7 +130,7 @@ const AuthPage = () => {
         <AnimatedBookCovers />
         <div className="welcome-content">
           <FaBookOpen className="welcome-icon" />
-          <h1 className="welcome-title">مرحباً بك في iLibrary</h1>
+          <h1 className="welcome-title">مرحباً بك في Muejam Library</h1>
           <p className="welcome-text">
             بوابتك إلى عالم من المعرفة والمتعة. سجل دخولك أو أنشئ حساباً جديداً لتبدأ رحلتك.
           </p>
@@ -151,9 +160,9 @@ const AuthPage = () => {
               <label htmlFor="password" className="sr-only">كلمة المرور</label>
               <FaLock aria-hidden="true" /><input type="password" id="password" name="password" placeholder="كلمة المرور" value={formData.password} onChange={handleChange} required />
             </div>
-            
+
             {error && <p className="error-message">{error}</p>}
-            
+
             <button type="submit" className="auth-button" disabled={isLoading}>
               {isLoading ? 'جاري...' : (isLogin ? 'تسجيل الدخول' : 'إنشاء حساب')}
             </button>

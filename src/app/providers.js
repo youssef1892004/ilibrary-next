@@ -6,10 +6,12 @@ import client from "@/lib/apollo";
 import { AuthProvider } from "@/context/AuthContext";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 import { LanguageProvider } from "@/context/LanguageContext";
-import { ThemeProvider } from "next-themes"; // <--  1. تم التعديل لاستيرادها مباشرة من المكتبة
+import { ReadingSettingsProvider } from "@/context/ReadingSettingsContext";
+import { ThemeProvider } from "next-themes";
+import { Toaster } from 'react-hot-toast';
 import { useEffect } from "react";
 
-export function Providers({ children }) {
+export function Providers({ children, initialUser }) { // Accept initialUser
   useEffect(() => {
     // هذا الكود سيتم تنفيذه مرة واحدة فقط عند تحميل الموقع
     // ملاحظة: هذا سيمسح كل شيء، بما في ذلك بيانات تسجيل دخول المستخدم إذا كانت محفوظة هنا.
@@ -20,11 +22,14 @@ export function Providers({ children }) {
   return (
     <ApolloProvider client={client}>
       <LanguageProvider>
-        <AuthProvider>
+        <AuthProvider initialUser={initialUser}> {/* Pass to AuthProvider */}
           <FavoritesProvider>
             {/* 2. التأكد من أن ThemeProvider يحيط بالمحتوى */}
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-              {children}
+              <ReadingSettingsProvider>
+                {children}
+                <Toaster position="bottom-right" reverseOrder={false} />
+              </ReadingSettingsProvider>
             </ThemeProvider>
           </FavoritesProvider>
         </AuthProvider>

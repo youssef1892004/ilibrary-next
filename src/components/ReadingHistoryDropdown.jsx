@@ -16,7 +16,8 @@ const GET_READING_HISTORY_BASIC = gql`
       id
       last_read
       book_id
-      last_read_chapter_id
+      last_read
+      book_id
     }
   }
 `;
@@ -44,7 +45,14 @@ const ReadingHistoryDropdown = () => {
           <HistoryDropdownItem
             key={item.id}
             bookId={item.book_id}
-            chapterId={item.last_read_chapter_id}
+            chapterId={(() => {
+              try {
+                if (item.last_read && item.last_read.startsWith('{')) {
+                  return JSON.parse(item.last_read).chapterId;
+                }
+              } catch (e) { }
+              return item.last_read_chapter_id;
+            })()}
             lastRead={item.last_read}
           />
         ))}

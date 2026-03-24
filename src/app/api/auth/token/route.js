@@ -36,6 +36,10 @@ async function getUserByEmail(email) {
   return data.data?.users[0];
 }
 
+import { cookies } from 'next/headers'; // Import cookies
+
+// ... (existing imports and helper functions)
+
 export async function POST(request) {
   try {
     const { email, password } = await request.json();
@@ -52,16 +56,16 @@ export async function POST(request) {
     if (!isPasswordValid) {
       return jsonResponse({ message: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.' }, 401);
     }
-    
+
     const jwtSecretObject = JSON.parse(process.env.HASURA_GRAPHQL_JWT_SECRET);
     if (!jwtSecretObject || !jwtSecretObject.key) {
-        throw new Error("JWT Secret Key is not configured correctly.");
+      throw new Error("JWT Secret Key is not configured correctly.");
     }
 
     const userRoles = Array.isArray(user.roles) ? user.roles.map(r => r.role) : [];
     const allowedRoles = ['user', ...userRoles];
     const defaultRole = userRoles.length > 0 ? userRoles[0] : "user";
-    
+
     const claims = {
       "https://hasura.io/jwt/claims": {
         "x-hasura-allowed-roles": allowedRoles,
@@ -71,11 +75,24 @@ export async function POST(request) {
       // ---  الحل هنا: نقوم بتحديد وقت الإصدار يدوياً ---
       // يتم ضبط وقت الإصدار على "30 ثانية في الماضي" لتجنب مشاكل فارق التوقيت
       iat: Math.floor(Date.now() / 1000) - 30,
+      // Add custom fields for UI hydration
+      email: user.email,
+      displayName: user.displayName,
     };
 
     const token = jwt.sign(claims, jwtSecretObject.key, {
       algorithm: 'HS256',
       expiresIn: '1d',
+    });
+
+    // --- Set HttpOnly Cookie ---
+    const cookieStore = await cookies();
+    cookieStore.set('auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24, // 1 day in seconds
+      path: '/',
     });
 
     return jsonResponse({

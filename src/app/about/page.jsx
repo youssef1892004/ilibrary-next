@@ -24,7 +24,7 @@ const AboutPage = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            عن <span className="text-purple-600 dark:text-purple-400">iLibrary</span>
+            عن <span className="text-purple-600 dark:text-purple-400">Muejam Library</span>
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             مكتبة إلكترونية شاملة للكتب العربية والمحتوى الثقافي الأصيل
@@ -37,7 +37,7 @@ const AboutPage = () => {
           <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 shadow-md">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">رؤيتنا</h2>
             <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-              نسعى لأن نكون المنصة الرائدة في العالم العربي لنشر وتوزيع الكتب الإلكترونية، 
+              نسعى لأن نكون المنصة الرائدة في العالم العربي لنشر وتوزيع الكتب الإلكترونية،
               ونهدف إلى جعل المعرفة في متناول الجميع، وتشجيع القراءة كجزء أساسي من حياة الفرد اليومية.
             </p>
           </div>
@@ -46,7 +46,7 @@ const AboutPage = () => {
           <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 shadow-md">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">مهمتنا</h2>
             <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-              توفير مكتبة رقمية شاملة تضم أفضل الكتب العربية في مختلف المجالات، 
+              توفير مكتبة رقمية شاملة تضم أفضل الكتب العربية في مختلف المجالات،
               مع تقديم تجربة قراءة مميزة وتفاعلية للقراء في جميع أنحاء العالم، ودعم المؤلفين والناشرين العرب.
             </p>
           </div>
@@ -55,13 +55,13 @@ const AboutPage = () => {
           <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 shadow-md">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">فريق العمل</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <TeamMemberCard 
-                name=" ENG. Abd Elsabour" 
+              <TeamMemberCard
+                name=" ENG. Abd Elsabour"
                 role="Back-End Developer"
                 imageUrl="https://ui-avatars.com/api/?name=Abd+Elsabour&background=1f2937&color=fff&size=128"
               />
-              <TeamMemberCard 
-                name=" ENG. Youssef" 
+              <TeamMemberCard
+                name=" ENG. Youssef"
                 role="Front-End Developer"
                 imageUrl="https://ui-avatars.com/api/?name=Youssef&background=8b5cf6&color=fff&size=128"
               />
@@ -78,9 +78,9 @@ const AboutPage = () => {
               كن جزءًا من رحلة نشر المعرفة والثقافة العربية وشاركنا شغفك بالكلمة المقروءة.
             </p>
             <Link href="/books">
-                <button className="px-8 py-3 bg-white text-purple-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors transform hover:scale-105">
-                    ابدأ التصفح الآن
-                </button>
+              <button className="px-8 py-3 bg-white text-purple-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors transform hover:scale-105">
+                ابدأ التصفح الآن
+              </button>
             </Link>
           </div>
         </div>

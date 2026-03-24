@@ -22,8 +22,18 @@ const HistoryBookCard = ({ bookId, lastRead }) => {
 
   const book = data?.libaray_Book_by_pk;
 
+  let displayLabel = lastRead;
+  try {
+    if (lastRead && lastRead.startsWith('{')) {
+      const parsed = JSON.parse(lastRead);
+      displayLabel = parsed.label;
+    }
+  } catch (e) {
+    // Keep as is
+  }
+
   if (loading) return <div className="bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse h-[320px]"></div>;
-  if (error || !book) return null; 
+  if (error || !book) return null;
 
   return (
     <Link href={`/books/${book.id}?continue_from=${encodeURIComponent(lastRead)}`} className="block group">
@@ -39,7 +49,7 @@ const HistoryBookCard = ({ bookId, lastRead }) => {
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-2">
             <FaBookmark className="text-purple-500" />
-            <span>آخر قراءة: {lastRead}</span>
+            <span>آخر قراءة: {displayLabel}</span>
           </p>
         </div>
       </div>

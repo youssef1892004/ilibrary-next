@@ -39,16 +39,32 @@ export const useReadingHistory = () => {
   });
   // --- نهاية التعديل ---
 
-  const saveProgress = useCallback(async (bookId, chapterLabel) => {
-    if (!user || !bookId || !chapterLabel) return;
+  const saveProgress = useCallback(async (bookId, chapterLabel, chapterId = null, scrollPosition = 0) => {
+    if (!user || !bookId) return;
+
+    // Create JSON for last_read if we have detailed info
+    let lastReadValue = chapterLabel;
+    if (chapterId) {
+      // We store it as a JSON string to keep compatibility while adding data
+      // Consumers must parse this or use it as legacy string if parsing fails
+      // Actually, let's keep it simple: "Chapter X" OR JSON.
+      // To avoid breaking old clients, we might face issues. 
+      // But since we control the frontend, we will update consumers to tryParse.
+      lastReadValue = JSON.stringify({
+        label: chapterLabel,
+        position: scrollPosition,
+        timestamp: Date.now()
+      });
+    }
+
     try {
       await deleteHistory({ variables: { bookId: bookId, userId: user.id } });
       await insertHistory({
         variables: {
           book_id: bookId,
           user_id: user.id,
-          last_read: chapterLabel,
-          last_read_at: new Date().toISOString(),
+          last_read: lastReadValue,
+          last_read_at: new Date().toISOString()
         }
       });
     } catch (err) {

@@ -1,0 +1,12 @@
+services:
+  library:
+    build: .
+    image: youssefessa2004/library-muejam:v0.0.1
+    container_name: library-muejam
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.local

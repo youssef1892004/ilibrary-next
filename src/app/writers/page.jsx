@@ -5,8 +5,8 @@ import WritersPageClient from './WritersPageClient';
 
 // SEO Metadata
 export const metadata = {
-  title: 'اكتشف مؤلفي iLibrary | تصفح أفضل الكتاب',
-  description: 'تعرف على المؤلفين والكتاب الذين يشكلون مكتبة iLibrary. تصفح سيرهم الذاتية واكتشف أعمالهم الأدبية.',
+  title: 'اكتشف مؤلفي Muejam Library | تصفح أفضل الكتاب',
+  description: 'تعرف على المؤلفين والكتاب الذين يشكلون مكتبة Muejam Library. تصفح سيرهم الذاتية واكتشف أعمالهم الأدبية.',
 };
 
 // Server-side Apollo Client

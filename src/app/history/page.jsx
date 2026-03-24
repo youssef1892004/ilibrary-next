@@ -3,6 +3,7 @@
 
 import React from 'react';
 import { useQuery, useMutation, gql } from '@apollo/client';
+import toast from 'react-hot-toast';
 import { useAuth } from '@/context/AuthContext';
 import HistoryBookCard from '@/components/HistoryBookCard';
 import { FaTrash } from 'react-icons/fa';
@@ -33,7 +34,7 @@ const DELETE_HISTORY_ITEM = gql`
 
 const HistoryPage = () => {
   const { user } = useAuth();
-  
+
   const { loading, error, data } = useQuery(GET_FULL_READING_HISTORY, {
     variables: { userId: user?.id },
     skip: !user,
@@ -55,7 +56,7 @@ const HistoryPage = () => {
       // لا حاجة لـ refetch() هنا لأنها ستحدث تلقائيًا
     } catch (err) {
       console.error("Failed to delete history item:", err);
-      alert("حدث خطأ أثناء الحذف.");
+      toast.error("حدث خطأ أثناء الحذف.");
     }
   };
 
@@ -78,7 +79,7 @@ const HistoryPage = () => {
       <h1 className="text-4xl font-bold text-center mb-10 text-gray-900 dark:text-white">
         سجل القراءة
       </h1>
-      
+
       {historyItems.length === 0 ? (
         <p className="text-center text-gray-500 dark:text-gray-400">لا يوجد سجل قراءة حتى الآن.</p>
       ) : (

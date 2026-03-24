@@ -57,19 +57,19 @@ export async function generateMetadata({ params }) {
 
     if (!writer) {
       return {
-        title: 'الكاتب غير موجود | iLibrary',
+        title: 'الكاتب غير موجود | Muejam Library',
         description: 'لم نتمكن من العثور على الكاتب الذي تبحث عنه.',
       };
     }
 
     return {
-      title: `صفحة الكاتب ${writer.name} | iLibrary`,
-      description: writer.bio?.substring(0, 160) || `اكتشف أعمال ومؤلفات الكاتب ${writer.name} على iLibrary.`,
+      title: `صفحة الكاتب ${writer.name} | Muejam Library`,
+      description: writer.bio?.substring(0, 160) || `اكتشف أعمال ومؤلفات الكاتب ${writer.name} على Muejam Library.`,
     };
   } catch (error) {
     console.error('Error generating metadata for writer:', error);
     return {
-      title: 'خطأ | iLibrary',
+      title: 'خطأ | Muejam Library',
       description: 'حدث خطأ أثناء تحميل بيانات الكاتب.',
     };
   }

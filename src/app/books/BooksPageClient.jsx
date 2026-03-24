@@ -1,21 +1,24 @@
 // src/app/books/BooksPageClient.jsx
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import BookCard from '@/components/BookCard';
+import BookListItem from '@/components/BookListItem';
+import BookCardSkeleton from '@/components/BookCardSkeleton';
+import BooksEmptyState from '@/components/BooksEmptyState';
+import MobileFilterDrawer from '@/components/MobileFilterDrawer';
 import { useLanguage } from '@/context/LanguageContext';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaSortAmountDown, FaLayerGroup, FaThLarge, FaList, FaTimes } from 'react-icons/fa';
 
 const BOOKS_PER_PAGE = 20;
 
-// --- بداية التعديل: تطبيق استعلامك الديناميكي ---
 const GET_BOOKS_WITH_RELATIONS = gql`
-  query GetBooksWithRelations($limit: Int!, $offset: Int!, $where: libaray_Book_bool_exp!) {
+  query GetBooksWithRelations($limit: Int!, $offset: Int!, $where: libaray_Book_bool_exp!, $order_by: [libaray_Book_order_by!]) {
     libaray_Book(
       limit: $limit,
       offset: $offset,
-      order_by: { publicationDate: desc },
+      order_by: $order_by,
       where: $where
     ) {
       id
@@ -27,10 +30,10 @@ const GET_BOOKS_WITH_RELATIONS = gql`
       book_category {
         name
       }
+      publicationDate
     }
   }
 `;
-// --- نهاية التعديل ---
 
 const GET_CATEGORIES = gql`
   query GetCategories {
@@ -47,6 +50,9 @@ const BooksPageClient = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [hasMore, setHasMore] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [sortBy, setSortBy] = useState('newest'); // newest, oldest, alphabetical
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const { data: categoriesData } = useQuery(GET_CATEGORIES);
   const categories = categoriesData?.libaray_Category || [];
@@ -58,55 +64,54 @@ const BooksPageClient = () => {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  // --- بداية التعديل: بناء جملة 'where' بشكل ديناميكي ---
-  const whereClause = {
-    _or: [
-      { title: { _ilike: `%${debouncedSearchTerm}%` } },
-      { Book_Author: { name: { _ilike: `%${debouncedSearchTerm}%` } } }
-    ]
-  };
+  const whereClause = useMemo(() => {
+    const clause = {
+      _or: [
+        { title: { _ilike: `%${debouncedSearchTerm}%` } },
+        { Book_Author: { name: { _ilike: `%${debouncedSearchTerm}%` } } }
+      ]
+    };
+    if (selectedCategory) {
+      clause.book_category = { name: { _eq: selectedCategory } };
+    }
+    return clause;
+  }, [debouncedSearchTerm, selectedCategory]);
 
-  if (selectedCategory) {
-    whereClause.book_category = { name: { _eq: selectedCategory } };
-  }
-  // --- نهاية التعديل ---
+  const orderBy = useMemo(() => {
+    switch (sortBy) {
+      case 'oldest': return { publicationDate: 'asc' };
+      case 'alphabetical': return { title: 'asc' };
+      case 'newest':
+      default: return { publicationDate: 'desc' };
+    }
+  }, [sortBy]);
 
   const { loading, error, data, fetchMore } = useQuery(GET_BOOKS_WITH_RELATIONS, {
     variables: {
       limit: BOOKS_PER_PAGE,
       offset: 0,
-      where: whereClause
+      where: whereClause,
+      order_by: orderBy
     },
     notifyOnNetworkStatusChange: true,
   });
 
   useEffect(() => {
     setHasMore(true);
-  }, [debouncedSearchTerm, selectedCategory]);
+  }, [debouncedSearchTerm, selectedCategory, sortBy]);
 
-  const books = data?.libaray_Book || [];
+  const booksRaw = data?.libaray_Book || [];
 
-  useEffect(() => {
-    console.log("--- Book Data Changed ---");
-    console.log("Current book array:", books);
-
-    const ids = books.map(b => b.id);
-    const missingIds = books.filter(b => !b.id);
-    if (missingIds.length > 0) {
-      console.error("Found books with missing IDs:", missingIds);
-    }
-
-    const idCounts = ids.reduce((acc, id) => {
-      acc[id] = (acc[id] || 0) + 1;
-      return acc;
-    }, {});
-
-    const duplicateIds = Object.keys(idCounts).filter(id => idCounts[id] > 1);
-    if (duplicateIds.length > 0) {
-      console.error("Found duplicate book IDs:", duplicateIds);
-      console.log("Books with duplicate IDs:", books.filter(b => duplicateIds.includes(b.id)));
-    }
-  }, [books]);
+  // Deduplicate books
+  const books = useMemo(() => {
+    const uniqueIds = new Set();
+    return booksRaw.filter(book => {
+      if (!book.id) return false;
+      if (uniqueIds.has(book.id)) return false;
+      uniqueIds.add(book.id);
+      return true;
+    });
+  }, [booksRaw]);
 
   const loadMore = useCallback(() => {
     if (loading || !hasMore) return;
@@ -139,69 +144,215 @@ const BooksPageClient = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [loading, loadMore]);
 
+  const handleReset = () => {
+    setSearchTerm("");
+    setSelectedCategory(null);
+    setSortBy('newest');
+  };
+
+  // Skeletons
+  const renderSkeletons = () => {
+    return Array(10).fill(0).map((_, i) => (
+      <div key={i} className={viewMode === 'list' ? 'h-48' : 'aspect-[2/3]'}>
+        <BookCardSkeleton />
+      </div>
+    ));
+  };
+
+  const FilterContent = () => (
+    <div className="flex flex-col gap-1">
+      <button
+        onClick={() => { setSelectedCategory(null); setIsFilterOpen(false); }}
+        className={`text-right px-3 py-2 rounded-lg text-sm transition-all ${selectedCategory === null
+          ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 font-bold border-r-4 border-purple-500'
+          : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+          }`}
+      >
+        الكل
+      </button>
+      {categories.map(cat => (
+        <button
+          key={cat.id}
+          onClick={() => { setSelectedCategory(cat.name); setIsFilterOpen(false); }}
+          className={`text-right px-3 py-2 rounded-lg text-sm transition-all ${selectedCategory === cat.name
+            ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 font-bold border-r-4 border-purple-500'
+            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+            }`}
+        >
+          {cat.name}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-center mb-6 text-gray-900 dark:text-white">
-        {t.allBooks || "جميع الكتب"}
-      </h1>
-      <div className="mb-8 max-w-2xl mx-auto">
-        <div className="relative">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-            <FaSearch className="text-gray-400" />
-          </span>
-          <input
-            type="text"
-            placeholder="ابحث عن كتاب أو كاتب..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
+      {/* Mobile Filter Drawer */}
+      <MobileFilterDrawer isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)}>
+        <FilterContent />
+      </MobileFilterDrawer>
+
+      {/* Header & Search */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div className="w-full md:w-auto flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <FaLayerGroup className="text-purple-600" />
+              {t.allBooks || "مكتبة الكتب"}
+            </h1>
+            <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-1">تصفح مجموعتنا المميزة من الكتب</p>
+          </div>
+
+          {/* Mobile Filter Button */}
+          <button
+            onClick={() => setIsFilterOpen(true)}
+            className="lg:hidden p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm text-gray-700 dark:text-gray-200"
+            aria-label="Open Filters"
+          >
+            <FaFilter />
+          </button>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-stretch sm:items-center">
+          {/* Controls Container */}
+          <div className="flex gap-2 w-full sm:w-auto order-2 sm:order-1">
+            {/* View Toggle */}
+            <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg shrink-0">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-gray-600 shadow-sm text-purple-600' : 'text-gray-500 dark:text-gray-400'}`}
+                aria-label="Grid View"
+              >
+                <FaThLarge />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-2 rounded-md transition-all ${viewMode === 'list' ? 'bg-white dark:bg-gray-600 shadow-sm text-purple-600' : 'text-gray-500 dark:text-gray-400'}`}
+                aria-label="List View"
+              >
+                <FaList />
+              </button>
+            </div>
+
+            {/* Sort Select */}
+            <div className="relative min-w-[140px] flex-grow">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full pl-4 pr-8 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-800 dark:text-white appearance-none cursor-pointer h-full"
+              >
+                <option value="newest">الأحدث</option>
+                <option value="oldest">الأقدم</option>
+                <option value="alphabetical">أبجدياً</option>
+              </select>
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <FaSortAmountDown className="text-gray-400" />
+              </span>
+            </div>
+          </div>
+
+          {/* Search Input */}
+          <div className="relative flex-grow sm:flex-grow-0 sm:w-64 order-1 sm:order-2">
+            <span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <FaSearch className="text-gray-400" />
+            </span>
+            <input
+              type="text"
+              placeholder="ابحث عن كتاب..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pr-10 pl-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-800 dark:text-white"
+            />
+          </div>
         </div>
       </div>
 
-      <div className="flex justify-center flex-wrap gap-2 mb-12">
-        <button
-          onClick={() => setSelectedCategory(null)}
-          className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${selectedCategory === null ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}`}
-        >
-          الكل
-        </button>
-        {categories.map((category) => (
+      {/* Active Filters Bar */}
+      {(searchTerm || selectedCategory) && (
+        <div className="flex flex-wrap gap-2 mb-6 animate-fadeIn">
+          <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center h-8">نتائج البحث عن:</span>
+
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium hover:bg-purple-200 dark:hover:bg-purple-800/50 transition-colors"
+            >
+              "{searchTerm}"
+              <FaTimes size={12} />
+            </button>
+          )}
+
+          {selectedCategory && (
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-800/50 transition-colors"
+            >
+              القسم: {selectedCategory}
+              <FaTimes size={12} />
+            </button>
+          )}
+
           <button
-            key={category.id}
-            onClick={() => setSelectedCategory(category.name)}
-            className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${selectedCategory === category.name ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}`}
+            onClick={handleReset}
+            className="text-sm text-gray-500 hover:text-red-500 underline ml-2"
           >
-            {category.name}
+            مسح الكل
           </button>
-        ))}
-      </div>
-      
-      {loading && books.length === 0 && <div className="text-center py-10"><p>جاري البحث...</p></div>}
-      {error && <div className="text-center py-10 text-red-500"><p>حدث خطأ أثناء جلب البيانات: {error.message}</p></div>}
-      
-      {!error && (
-        <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {books.map((book, index) => (
-              <BookCard key={book.id || index} book={book} sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw" />
-            ))}
+        </div>
+      )}
+
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Desktop Sidebar Filters */}
+        <aside className="hidden lg:block w-64 flex-shrink-0">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 sticky top-24 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <FaFilter className="text-purple-500" />
+                التصنيفات
+              </h3>
+            </div>
+            <div className="max-h-[60vh] overflow-y-auto pr-1 custom-scrollbar">
+              <FilterContent />
+            </div>
           </div>
-          
-          {books.length === 0 && !loading && (
-            <div className="text-center py-20">
-              <p className="text-lg text-gray-500 dark:text-gray-400">
-                لم يتم العثور على كتب تطابق بحثك أو التصنيف المختار.
-              </p>
+        </aside>
+
+        {/* Main Grid */}
+        <main className="flex-grow">
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 p-4 rounded-lg text-center mb-6">
+              حدث خطأ أثناء تحميل الكتب. يرجى المحاولة مرة أخرى.
             </div>
           )}
-          
-          <div className="text-center py-10">
-            {loading && books.length > 0 && <p className="animate-pulse">جاري تحميل المزيد...</p>}
-            {!hasMore && books.length > 0 && <p>لقد وصلت إلى نهاية القائمة.</p>}
-          </div>
-        </>
-      )}
+
+          {!loading && !error && books.length === 0 ? (
+            <BooksEmptyState onReset={handleReset} />
+          ) : (
+            <div className={
+              viewMode === 'grid'
+                ? "grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6" // Smaller gap on mobile
+                : "flex flex-col gap-4"
+            }>
+              {books.map((book) => (
+                viewMode === 'grid' ? (
+                  <BookCard key={book.id} book={book} sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" />
+                ) : (
+                  <BookListItem key={book.id} book={book} />
+                )
+              ))}
+
+              {/* Loading Skeletons */}
+              {loading && renderSkeletons()}
+            </div>
+          )}
+
+          {!hasMore && books.length > 0 && (
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-800 mt-12">
+              <p>✨ لقد وصلت إلى نهاية القائمة</p>
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 };

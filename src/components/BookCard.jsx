@@ -5,13 +5,14 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaHeart, FaRegHeart, FaBookOpen, FaUserAlt, FaTag } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 import { useDbFavorites } from '@/hooks/useDbFavorites'; // 1. استيراد الـ Hook الجديد
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext'; // 2. استيراد useAuth للتحقق من المستخدم
 
 const BookCard = ({ book, authorName: authorNameFromProp, sizes }) => {
   if (!book) {
-    return null; 
+    return null;
   }
 
   const { t } = useLanguage();
@@ -30,15 +31,15 @@ const BookCard = ({ book, authorName: authorNameFromProp, sizes }) => {
 
     // 6. التأكد من أن المستخدم قد سجل دخوله قبل الإضافة/الحذف
     if (!user) {
-      // يمكنك هنا إظهار رسالة للمستخدم تطلب منه تسجيل الدخول
-      alert("يرجى تسجيل الدخول أولاً لإضافة الكتب إلى المفضلة.");
+      // ملاحظة: يمكنك هنا إظهار رسالة للمستخدم تطلب منه تسجيل الدخول
+      toast.error("يرجى تسجيل الدخول أولاً لإضافة الكتب إلى المفضلة.");
       return;
     }
-    
+
     if (favoriteStatus) {
       removeFavorite(book.id);
     } else {
-      addFavorite(book.id); 
+      addFavorite(book.id);
     }
   };
 
@@ -65,7 +66,7 @@ const BookCard = ({ book, authorName: authorNameFromProp, sizes }) => {
           </div>
         )}
       </Link>
-      
+
       <div className="p-4 flex flex-col flex-grow">
         <Link href={`/books/${book.id}`} className="block">
           <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2 line-clamp-2 h-14 group-hover:text-purple-600 dark:group-hover:text-purple-400">
@@ -78,19 +79,19 @@ const BookCard = ({ book, authorName: authorNameFromProp, sizes }) => {
             {t.by || "بواسطة"}: {authorName}
           </p>
         )}
-        
-        <div className="flex-grow"></div> 
+
+        <div className="flex-grow"></div>
 
         <div className="mt-auto pt-4 flex items-center gap-2">
-          <Link 
-            href={`/books/${book.id}`} 
+          <Link
+            href={`/books/${book.id}`}
             className="flex-grow flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
             aria-label={`اقرأ كتاب ${book.title}`}
           >
             <FaBookOpen />
             {t.readBook || "اقرأ الآن"}
           </Link>
-          
+
           <button
             onClick={handleFavoriteClick}
             className="p-2.5 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"

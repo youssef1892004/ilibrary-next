@@ -78,20 +78,20 @@ export async function generateMetadata({ params }) {
 
     if (!book) {
       return {
-        title: 'الكتاب غير موجود | iLibrary',
+        title: 'الكتاب غير موجود | Muejam Library',
         description: 'لم نتمكن من العثور على الكتاب الذي تبحث عنه.',
       };
     }
 
     const authorName = book.Book_Author?.[0]?.name || 'مؤلف غير معروف';
     return {
-      title: `قراءة كتاب ${book.title} - ${authorName} | iLibrary`,
+      title: `قراءة كتاب ${book.title} - ${authorName} | Muejam Library`,
       description: book.description?.substring(0, 160) || `استكشف تفاصيل ومعلومات عن كتاب ${book.title}.`,
     };
   } catch (error) {
     console.error('Error generating metadata for book:', error);
     return {
-      title: 'خطأ | iLibrary',
+      title: 'خطأ | Muejam Library',
       description: 'حدث خطأ أثناء تحميل بيانات الكتاب.',
     };
   }
@@ -103,6 +103,8 @@ const BookDetailsPage = async ({ params }) => {
   const awaitedParams = await params;
   const bookId = awaitedParams.id;
 
+  console.log(`[BookDetailsPage] Fetching details for book ID: ${bookId}`);
+
   let book = null;
 
   try {
@@ -111,17 +113,22 @@ const BookDetailsPage = async ({ params }) => {
       variables: { id: bookId },
     });
     book = data?.libaray_Book_by_pk;
+    console.log(`[BookDetailsPage] Data fetched. Book found: ${!!book}`);
   } catch (e) {
-    console.error("Error fetching book details on server:", e);
+    console.error("[BookDetailsPage] Error fetching book details on server:", e);
     // By not re-throwing or passing the error, we ensure nothing non-serializable is sent to the client.
     // The component will proceed with `book` as null.
   }
 
   if (!book) {
+    console.log("[BookDetailsPage] Book not found, triggering notFound()");
     notFound();
   }
 
-  return <BookDetailsClient book={book} />;
+  // Ensure book is a plain JSON object to avoid any complex prototype/hidden property issues during serialization
+  const serializedBook = JSON.parse(JSON.stringify(book));
+
+  return <BookDetailsClient book={serializedBook} />;
 };
 
 export default BookDetailsPage;

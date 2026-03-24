@@ -12,8 +12,8 @@ const FeatureCard = ({ image, title, description, link }) => {
         <Image
           src={image}
           alt={title}
-          layout="fill"
-          objectFit="cover"
+          fill
+          style={{ objectFit: 'cover' }}
           className="transition-transform duration-500 group-hover:scale-110"
         />
       </div>

@@ -21,6 +21,16 @@ const HistoryDropdownItem = ({ bookId, chapterId, lastRead }) => {
 
   const book = data?.libaray_Book_by_pk;
 
+  let displayLabel = lastRead;
+  try {
+    if (lastRead && lastRead.startsWith('{')) {
+      const parsed = JSON.parse(lastRead);
+      displayLabel = parsed.label;
+    }
+  } catch (e) {
+    // Keep as is
+  }
+
   if (loading) {
     return (
       <div className="p-3">
@@ -37,18 +47,20 @@ const HistoryDropdownItem = ({ bookId, chapterId, lastRead }) => {
 
   if (error || !book) return null;
 
+  const href = chapterId ? `/read/${chapterId}` : `/books/${bookId}`;
+
   return (
-    <Link href={`/read/${chapterId}`} className="block p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+    <Link href={href} className="block p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
       <div className="flex items-center gap-4">
-        <img 
-          src={book.coverImage || 'https://placehold.co/100x150'} 
+        <img
+          src={book.coverImage || 'https://placehold.co/100x150'}
           alt={book.title}
           className="w-12 h-16 object-cover rounded"
         />
         <div>
           <p className="font-semibold text-sm text-gray-900 dark:text-white truncate">{book.title}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            آخر قراءة: {lastRead}
+            آخر قراءة: {displayLabel}
           </p>
         </div>
       </div>

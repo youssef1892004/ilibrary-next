@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { FaBars, FaTimes, FaHeart, FaBookmark } from "react-icons/fa";
+import { FaBars, FaTimes, FaHeart, FaBookmark, FaSearch } from "react-icons/fa"; // Import FaSearch
 import ThemeSwitcher from "@/context/ThemeSwitcher";
 import logo from '../../public/logo.png';
 
@@ -46,12 +46,12 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
           <div className="flex-shrink-0">
             <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-              <Image 
-                src={logo} 
-                alt="iLibrary Logo" 
+              <Image
+                src={logo}
+                alt="Muejam Library Logo"
                 width={105}
                 height={35}
-                priority 
+                priority
               />
             </Link>
           </div>
@@ -63,8 +63,14 @@ export default function Navbar() {
           </nav>
 
           <div className="flex items-center justify-end gap-4 sm:gap-5">
-            <ThemeSwitcher/>
-            
+            <ThemeSwitcher />
+
+            {/* زر البحث الجديد */}
+            <Link href="/search" className="icon-button" aria-label="بحث متقدم">
+              <FaSearch size={20} />
+            </Link>
+
+
             <Link href="/favorites" className="icon-button relative" aria-label="View your favorites">
               <FaHeart className="hover:text-red-500" size={24} />
               {favorites.length > 0 && (
@@ -74,8 +80,8 @@ export default function Navbar() {
 
             {/* --- بداية التعديل: تحويل الزر إلى رابط --- */}
             {user && (
-              <Link 
-                href="/history" 
+              <Link
+                href="/history"
                 className="icon-button"
                 aria-label="سجل القراءة"
               >
@@ -102,10 +108,10 @@ export default function Navbar() {
                 </Link>
               )}
             </div>
-            
+
             <div className="md:hidden">
-              <button 
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="icon-button"
                 aria-label="Toggle mobile menu"
                 aria-expanded={isMobileMenuOpen}
@@ -124,28 +130,28 @@ export default function Navbar() {
             {navLinks.map((link) => (
               <NavLink key={link.href} href={link.href} onClick={() => setIsMobileMenuOpen(false)}>{link.label}</NavLink>
             ))}
-             <div className="border-t border-gray-700 pt-4 mt-2 space-y-3">
-               {isLoading ? (
-                 <p className="px-2 text-base font-medium mb-3">...</p>
-               ) : user ? (
-                   <>
-                     <div className="px-2 text-base font-medium mb-3">
-                       <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
-                         مرحباً، {user.displayName || user.email}
-                       </Link>
-                     </div>
-                     <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="w-full btn-primary-outline">
-                       {t.logout || "خروج"}
-                     </button>
-                   </>
-               ) : (
-                   <>
-                     <Link href="/auth" className="block w-full btn-primary-outline text-center" onClick={() => setIsMobileMenuOpen(false)}>
-                       {t.login || "دخول"}
-                     </Link>
-                   </>
-               )}
-             </div>
+            <div className="border-t border-gray-700 pt-4 mt-2 space-y-3">
+              {isLoading ? (
+                <p className="px-2 text-base font-medium mb-3">...</p>
+              ) : user ? (
+                <>
+                  <div className="px-2 text-base font-medium mb-3">
+                    <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                      مرحباً، {user.displayName || user.email}
+                    </Link>
+                  </div>
+                  <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="w-full btn-primary-outline">
+                    {t.logout || "خروج"}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth" className="block w-full btn-primary-outline text-center" onClick={() => setIsMobileMenuOpen(false)}>
+                    {t.login || "دخول"}
+                  </Link>
+                </>
+              )}
+            </div>
           </nav>
         </div>
       )}

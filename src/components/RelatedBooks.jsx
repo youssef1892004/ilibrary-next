@@ -1,28 +1,69 @@
+"use client";
+
 import React from 'react';
-// لم نعد بحاجة لاستيراد Link هنا، فقد تم حذفه
-import { booksData } from '@/data/mockData'; // استخدام المسار الصحيح
-import BookCard from '@/components/BookCard'; 
+import { useQuery, gql } from '@apollo/client';
+import BookCard from '@/components/BookCard';
+import BookCardSkeleton from '@/components/BookCardSkeleton';
+import { FaLayerGroup } from 'react-icons/fa';
 
-const RelatedBooks = ({ currentBookId, category }) => {
-  const related = booksData
-    .filter(book => book.category === category && book.id !== currentBookId)
-    .slice(0, 4); // جلب 4 كتب ذات صلة كحد أقصى
-
-  // لا تعرض أي شيء إذا لم توجد كتب ذات صلة
-  if (related.length === 0) {
-    return null;
+const GET_RELATED_BOOKS = gql`
+  query GetRelatedBooks($categoryId: uuid!, $currentBookId: uuid!) {
+    libaray_Book(
+      where: {
+        book_category: { id: { _eq: $categoryId } },
+        id: { _neq: $currentBookId }
+      },
+      limit: 4,
+      order_by: { publicationDate: desc }
+    ) {
+      id
+      title
+      coverImage
+      Book_Author {
+         name
+      }
+      book_category {
+         name
+      }
+      publicationDate
+    }
   }
+`;
+
+const RelatedBooks = ({ categoryId, currentBookId }) => {
+  if (!categoryId) return null;
+
+  const { data, loading, error } = useQuery(GET_RELATED_BOOKS, {
+    variables: { categoryId, currentBookId },
+    skip: !categoryId,
+  });
+
+  const books = data?.libaray_Book || [];
+
+  if (!loading && books.length === 0) return null;
 
   return (
-    <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
-      <h3 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">
+    <div className="mt-16 border-t border-gray-100 dark:border-gray-800 pt-12">
+      <h2 className="text-2xl font-bold mb-8 flex items-center gap-2 text-gray-900 dark:text-white">
+        <FaLayerGroup className="text-purple-600" />
         كتب ذات صلة
-      </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        {related.map(book => (
-          <BookCard key={book.id} book={book} sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw" />
-        ))}
-      </div>
+      </h2>
+
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="aspect-[2/3]">
+              <BookCardSkeleton />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {books.map((book) => (
+            <BookCard key={book.id} book={book} sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
